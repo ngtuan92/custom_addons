@@ -1,0 +1,69 @@
+<odoo>
+    <!-- FORM VIEW -->
+    <record id="view_form_my_model" model="ir.ui.view">
+        <field name="name">my.model.form</field>
+        <field name="model">my.model</field>
+        <field name="arch" type="xml">
+            <form string="Word Preview Export">
+                <header>
+                    <button name="action_export_word"
+                            type="object"
+                            string="Xuất Word"
+                            class="btn-primary"/>
+                </header>
+
+                <sheet>
+                    <!-- Upload Section -->
+                    <group string="Tải lên File Word">
+                        <field name="name"/>
+                        <field name="word_file" filename="word_filename"/>
+                        <field name="word_filename" invisible="1"/>
+                    </group>
+
+                    <!-- Preview Section - BÊN NGOÀI notebook -->
+                    <group string="Preview PDF" colspan="2" col="1">
+                        <div class="oe_title" attrs="{'invisible': [('pdf_preview', '=', False)]}">
+                            <field name="pdf_preview"
+                                   widget="pdf_viewer"
+                                   nolabel="1"
+                                   style="min-height: 600px;"/>
+                            <field name="pdf_filename" invisible="1"/>
+                        </div>
+                        <div attrs="{'invisible': [('pdf_preview', '!=', False)]}">
+                            <p class="text-muted">Chưa có preview. Vui lòng upload file .docx</p>
+                        </div>
+                    </group>
+                </sheet>
+            </form>
+
+        </field>
+    </record>
+
+    <!-- TREE VIEW -->
+    <record id="view_tree_my_model" model="ir.ui.view">
+        <field name="name">my.model.tree</field>
+        <field name="model">my.model</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="word_filename"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- ACTION -->
+    <record id="action_my_model" model="ir.actions.act_window">
+        <field name="name">Word Preview Export</field>
+        <field name="res_model">my.model</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <!-- MENU -->
+    <menuitem id="menu_word_preview_root"
+              name="Word Demo"/>
+
+    <menuitem id="menu_word_preview"
+              name="Word Preview Export"
+              parent="menu_word_preview_root"
+              action="action_my_model"/>
+</odoo>

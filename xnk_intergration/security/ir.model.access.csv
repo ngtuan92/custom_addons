@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_product_sync_user,access_product_sync_user,model_product_sync,base.group_user,1,1,1,0
+access_product_sync_manager,access_product_sync_manager,model_product_sync,base.group_system,1,1,1,1
+access_xnk_brand_user,access_xnk_brand_user,model_xnk_brand,base.group_user,1,0,0,0
+access_xnk_brand_manager,access_xnk_brand_manager,model_xnk_brand,base.group_system,1,1,1,1
+access_xnk_warranty_user,access_xnk_warranty_user,model_xnk_warranty,base.group_user,1,0,0,0
+access_xnk_warranty_manager,access_xnk_warranty_manager,model_xnk_warranty,base.group_system,1,1,1,1
+access_xnk_country_user,xnk.country user,model_xnk_country,base.group_user,1,1,1,1

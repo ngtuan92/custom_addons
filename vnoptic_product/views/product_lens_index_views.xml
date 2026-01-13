@@ -1,0 +1,40 @@
+<odoo>
+    <record id="product_lens_index_tree_view" model="ir.ui.view">
+        <field name="name">product.lens.index.tree</field>
+        <field name="model">product.lens.index</field>
+        <field name="arch" type="xml">
+            <tree string="Lens Index">
+                <field name="name"/>
+                <field name="cid"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="product_lens_index_form_view" model="ir.ui.view">
+        <field name="name">product.lens.index.form</field>
+        <field name="model">product.lens.index</field>
+        <field name="arch" type="xml">
+            <form string="Lens Index">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="cid"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_product_lens_index" model="ir.actions.act_window">
+        <field name="name">Lens Index</field>
+        <field name="res_model">product.lens.index</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

@@ -1,0 +1,40 @@
+<odoo>
+    <record id="product_material_tree_view" model="ir.ui.view">
+        <field name="name">product.material.tree</field>
+        <field name="model">product.material</field>
+        <field name="arch" type="xml">
+            <tree string="Product Material">
+                <field name="name"/>
+                <field name="cid"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="product_material_form_view" model="ir.ui.view">
+        <field name="name">product.material.form</field>
+        <field name="model">product.material</field>
+        <field name="arch" type="xml">
+            <form string="Product Material">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="cid"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_product_material" model="ir.actions.act_window">
+        <field name="name">Product Material</field>
+        <field name="res_model">product.material</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

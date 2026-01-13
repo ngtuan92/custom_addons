@@ -1,0 +1,135 @@
+<odoo>
+    <!-- Custom Tree View for VNOPTIC Products -->
+    <record id="product_template_tree_view_vnoptic" model="ir.ui.view">
+        <field name="name">product.template.tree.vnoptic</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <!-- Add fields after default_code -->
+            <xpath expr="//field[@name='default_code']" position="after">
+                <field name="brand_id" string="Thương hiệu" optional="show"/>
+                <field name="supplier_id" string="Nhà cung cấp" optional="hide"/>
+                <field name="country_id" string="Xuất xứ" optional="hide"/>
+            </xpath>
+            
+            <!-- Hide default Sales Price column and replace with Vietnamese label -->
+            <xpath expr="//field[@name='list_price']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            
+            <xpath expr="//field[@name='list_price']" position="after">
+                <field name="list_price" string="Giá bán lẻ" optional="show"/>
+                <field name="x_ws_price" string="Giá sỉ" optional="show"/>
+                <field name="x_ct_price" string="Giá vốn" optional="hide"/>
+                <field name="x_or_price" string="Giá nguyên tệ" optional="hide"/>
+                <field name="x_ws_price_max" string="Giá sỉ max" optional="hide"/>
+                <field name="x_ws_price_min" string="Giá sỉ min" optional="hide"/>
+                <field name="x_tax_percent" string="Thuế %" optional="show"/>
+            </xpath>
+            
+            <!-- Add status and warranty before company_id if exists, otherwise at end -->
+            <xpath expr="//tree" position="inside">
+                <field name="status_product_id" optional="hide"/>
+                <field name="warranty_id" optional="hide"/>
+            </xpath>
+            
+            <!-- Add custom Create button that opens external URL -->
+            <xpath expr="//tree" position="attributes">
+                <attribute name="create">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="product_template_form_view_lens" model="ir.ui.view">
+        <field name="name">product.template.form.lens</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='list_price']" position="after">
+                <group string="VNOPTIC Product Information">
+                    <group>
+                        <field name="eng_name"/>
+                        <field name="eng_name"/>
+                        <field name="trade_name"/>
+                        <field name="product_type"/>
+                        <field name="brand_id" string="Thương hiệu" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="supplier_id" string="Nhà cung cấp" options="{'no_create': True, 'no_open': True}"/>
+                    </group>
+                    <group>
+                        <field name="country_id" string="Xuất xứ" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="status_product_id" string="Trạng thái" options="{'no_create': True, 'no_open': True}"/>
+                        <field name="unit" string="Đơn vị"/>
+                        <field name="warranty_id" string="Bảo hành" options="{'no_create': True, 'no_open': True}"/>
+                    </group>
+                </group>
+
+                <notebook>
+                    <page string="Giá &amp; Thuế">
+                        <group>
+                            <group string="Giá bán">
+                                <field name="list_price" string="Giá bán lẻ (Retail)"/>
+                                <field name="x_ws_price" string="Giá sỉ (Wholesale)"/>
+                                <field name="x_ws_price_max" string="Giá sỉ tối đa"/>
+                                <field name="x_ws_price_min" string="Giá sỉ tối thiểu"/>
+                            </group>
+                            <group string="Giá vốn &amp; Thuế">
+                                <field name="x_ct_price" string="Giá vốn (Cost)"/>
+                                <field name="x_or_price" string="Giá nguyên tệ (Original)"/>
+                                <field name="x_tax_percent" string="Thuế (%)"/>
+                                <field name="currency_zone_id" options="{'no_create': True, 'no_open': True}"/>
+                            </group>
+                        </group>
+                    </page>
+                    
+                    <page string="Mô tả &amp; Hướng dẫn">
+                        <group>
+                            <group string="Mô tả">
+                                <field name="uses" placeholder="Công dụng"/>
+                                <field name="guide" placeholder="Hướng dẫn sử dụng"/>
+                            </group>
+                            <group string="Cảnh báo &amp; Bảo quản">
+                                <field name="warning" placeholder="Cảnh báo"/>
+                                <field name="preserve" placeholder="Bảo quản"/>
+                            </group>
+                        </group>
+                    </page>
+
+                    <page string="Lens Details"
+                          attrs="{'invisible': [('product_type', '!=', 'lens')]}">
+                        <field name="lens_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="prism"/>
+                                <field name="base"/>
+                                <field name="axis"/>
+                                <field name="sph"/>
+                                <field name="cyl"/>
+                                <field name="len_add"/>
+                            </tree>
+                        </field>
+                    </page>
+
+                    <page string="Optical Details"
+                          attrs="{'invisible': [('product_type', '!=', 'opt')]}">
+                        <field name="opt_ids" nolabel="1">
+                            <tree editable="bottom">
+                                <field name="season"/>
+                                <field name="model"/>
+                                <field name="serial"/>
+                                <field name="sku"/>
+                                <field name="gender"/>
+                            </tree>
+                        </field>
+                    </page>
+
+                    <page string="Other Details"
+                          attrs="{'invisible': ['|', ('product_type', '=', 'lens'), ('product_type', '=', 'opt')]}">
+                        <group>
+                            <field name="description" placeholder="Thông tin bổ sung cho sản phẩm khác..."/>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </field>
+    </record>
+</odoo>

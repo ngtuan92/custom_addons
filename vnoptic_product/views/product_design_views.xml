@@ -1,0 +1,40 @@
+<odoo>
+    <record id="product_design_tree_view" model="ir.ui.view">
+        <field name="name">product.design.tree</field>
+        <field name="model">product.design</field>
+        <field name="arch" type="xml">
+            <tree string="Product Design">
+                <field name="name"/>
+                <field name="cid"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="product_design_form_view" model="ir.ui.view">
+        <field name="name">product.design.form</field>
+        <field name="model">product.design</field>
+        <field name="arch" type="xml">
+            <form string="Product Design">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="cid"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_product_design" model="ir.actions.act_window">
+        <field name="name">Product Design</field>
+        <field name="res_model">product.design</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>
