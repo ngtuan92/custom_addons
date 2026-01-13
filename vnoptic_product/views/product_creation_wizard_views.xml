@@ -11,7 +11,7 @@
                         <group>
                             <group string="Ảnh sản phẩm">
                                 <field name="image_1920" widget="image" class="oe_avatar"/>
-                                <field name="group_id" string="Nhóm"
+                                <field name="group_id" string="Nhómm"
                                        options="{'no_create': True, 'no_open': True}"/>
                             </group>
 
