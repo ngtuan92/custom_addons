@@ -3,7 +3,7 @@
 
     <!-- Consolidated Products Menu -->
     <menuitem id="menu_products_main" 
-              name="Sản phẩm" 
+              name="Sản phẩm đơn hàng"
               parent="menu_vnoptic_main" 
               sequence="20"/>
 
