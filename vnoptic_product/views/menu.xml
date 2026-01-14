@@ -1,6 +1,4 @@
 <odoo>
-    <menuitem id="menu_vnoptic_main" name="VNOPTIC" sequence="10"/>
-
     <!-- Consolidated Products Menu -->
     <menuitem id="menu_products_main" 
               name="Sản phẩm đơn hàng"
