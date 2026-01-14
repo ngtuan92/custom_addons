@@ -376,3 +376,22 @@ class ProductCreationWizard(models.TransientModel):
 
         self.env['product.opt'].create(vals)
         _logger.info(f"✅ OPT record created for product {product.id}")
+
+    def action_create_design1(self):
+        self.ensure_one()
+
+        return {
+            'name': 'Thêm Thiết Kế Mới',
+            'type': 'ir.actions.act_window',
+            'res_model': 'product.design',
+            'view_mode': 'form',
+            'view_id': self.env.ref('vnoptic_product.view_product_design_form_quick').id,
+            'target': 'new',
+            'context': {
+                'default_active': True,
+                'dialog_size': 'medium',
+            }
+        }
+
+    def action_create_design2(self):
+        return self.action_create_design1()  # Dùng chung logic

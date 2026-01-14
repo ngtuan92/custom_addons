@@ -1,9 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Tree -->
     <record id="product_design_tree_view" model="ir.ui.view">
         <field name="name">product.design.tree</field>
         <field name="model">product.design</field>
         <field name="arch" type="xml">
-            <tree string="Product Design">
+            <tree string="Thiết kế sản phẩm">
                 <field name="name"/>
                 <field name="cid"/>
                 <field name="active"/>
@@ -11,11 +13,12 @@
         </field>
     </record>
 
+    <!-- Form -->
     <record id="product_design_form_view" model="ir.ui.view">
         <field name="name">product.design.form</field>
         <field name="model">product.design</field>
         <field name="arch" type="xml">
-            <form string="Product Design">
+            <form string="Thiết kế sản phẩm">
                 <sheet>
                     <group>
                         <group>
@@ -32,9 +35,26 @@
         </field>
     </record>
 
+    <!-- Action -->
     <record id="action_product_design" model="ir.actions.act_window">
-        <field name="name">Product Design</field>
+        <field name="name">Thiết kế sản phẩm</field>
         <field name="res_model">product.design</field>
         <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Chưa có thiết kế nào!
+            </p>
+            <p>
+                Hãy tạo thiết kế đầu tiên của bạn.<br/>
+                Thiết kế giúp phân loại Lens/OPT theo mẫu (SF, PRO, ASPH...).
+            </p>
+        </field>
     </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_product_design"
+              name="Thiết kế"
+              parent="menu_vnoptic_main"
+              action="action_product_design"
+              sequence="25"/>
 </odoo>

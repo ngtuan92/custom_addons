@@ -6,8 +6,8 @@ class ProductGroup(models.Model):
     _description = 'Product Group'
     _order = 'name'
 
-    name = fields.Char('Group Name', required=True)
-    description = fields.Text('Description', size=200)
-    activated = fields.Boolean('Activated', default=True)
-    cid = fields.Char("Product Code", required=True)
-    group_type_id = fields.Many2one('product.group.type', string='Group Type')
+    name = fields.Char('Tên nhóm', required=True)
+    description = fields.Text('Mô tả', size=200)
+    activated = fields.Boolean('Kích hoạt', default=True)
+    cid = fields.Char("Mã nhóm", required=True)
+    group_type_id = fields.Many2one('product.group.type', string='Loại nhóm')

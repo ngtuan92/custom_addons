@@ -19,7 +19,10 @@ access_product_opt,product.opt,model_product_opt,base.group_user,1,1,1,1
 access_product_creation_wizard,product.creation.wizard,model_product_creation_wizard,base.group_user,1,1,1,0
 access_product_creation_wizard,product.creation.wizard,model_product_creation_wizard,base.group_user,1,1,1,0
 access_product_group_wizard,product.group.wizard,model_product_group_wizard,base.group_user,1,1,1,0
+access_product_design_wizard,product.design.wizard,model_product_design_wizard,base.group_user,1,1,1,0
 access_xnk_brand,xnk.brand,xnk_intergration.model_xnk_brand,base.group_user,1,1,1,1
 access_product_color,product.color,model_product_color,base.group_user,1,1,1,1
 access_product_brand_user,access.product.brand.user,model_product_brand,base.group_user,1,1,1,1
 access_product_brand_public,access.product.brand.public,model_product_brand,base.group_public,1,0,0,0
+access_product_material_wizard,product.material.wizard,model_product_material_wizard,base.group_user,1,1,1,0
+

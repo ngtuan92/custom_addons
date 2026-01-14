@@ -4,6 +4,7 @@ from . import product_color
 from . import product_creation_wizard
 from . import product_group_wizard
 from . import product_design
+from . import product_design_wizard
 from . import product_frame
 from . import product_frame_type
 from . import product_group
@@ -20,3 +21,4 @@ from . import product_uv
 from . import product_ve
 from . import product_warranty
 from . import product_brand
+from . import product_create_material

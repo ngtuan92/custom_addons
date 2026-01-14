@@ -106,10 +106,22 @@
                                 <group string="Thông số bổ sung">
                                     <field name="len_add" string="ADD"/>
                                     <field name="base" string="Base Curve"/>
-                                    <field name="design1_id" string="Thiết kế 1"
-                                           options="{'no_create': True, 'no_open': True}"/>
-                                    <field name="design2_id" string="Thiết kế 2"
-                                           options="{'no_create': True, 'no_open': True}"/>
+
+                                    <label for="design1_id"/>
+                                    <div class="o_row">
+                                        <field name="design1_id"
+                                               widget="many2many_tags"
+                                               options="{'no_open': True}"
+                                               placeholder="Chọn thiết kế..."/>
+                                    </div>
+
+                                    <label for="design2_id"/>
+                                    <div class="o_row">
+                                        <field name="design2_id"
+                                               widget="many2many_tags"
+                                               options="{'no_open': True}"
+                                               placeholder="Chọn thiết kế..."/>
+                                    </div>
                                 </group>
                             </group>
                         </page>
@@ -255,7 +267,8 @@
         <field name="context">{
             'default_product_type': 'lens',
             'default_unit': 'Chiếc'
-        }</field>
+            }
+        </field>
     </record>
 
     <record id="action_product_creation_wizard_opt_v2" model="ir.actions.act_window">
@@ -267,7 +280,8 @@
         <field name="context">{
             'default_product_type': 'opt',
             'default_unit': 'Chiếc'
-        }</field>
+            }
+        </field>
     </record>
 
     <record id="action_product_creation_wizard_other_v2" model="ir.actions.act_window">
@@ -279,7 +293,8 @@
         <field name="context">{
             'default_product_type': 'accessory',
             'default_unit': 'Chiếc'
-        }</field>
+            }
+        </field>
     </record>
 
 </odoo>

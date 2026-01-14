@@ -1,40 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="product_material_tree_view" model="ir.ui.view">
-        <field name="name">product.material.tree</field>
-        <field name="model">product.material</field>
+    <record id="view_product_material_wizard_form" model="ir.ui.view">
+        <field name="name">product.material.wizard.form</field>
+        <field name="model">product.material.wizard</field>
         <field name="arch" type="xml">
-            <tree string="Product Material">
-                <field name="name"/>
-                <field name="cid"/>
-                <field name="active"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="product_material_form_view" model="ir.ui.view">
-        <field name="name">product.material.form</field>
-        <field name="model">product.material</field>
-        <field name="arch" type="xml">
-            <form string="Product Material">
+            <form string="Tạo chất liệu">
                 <sheet>
                     <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="cid"/>
-                            <field name="active"/>
+                        <group string="Chiết suất (Lens Index)">
+                            <field name="create_index"/>
+                            <field name="index_name"
+                                   attrs="{'required':[('create_index','=',True)],
+                                           'invisible':[('create_index','=',False)]}"
+                                   placeholder="VD: Chiết suất 1.56"/>
+                            <field name="index_cid"
+                                   attrs="{'invisible':[('create_index','=',False)]}"
+                                   placeholder="VD: 156"/>
+                            <field name="index_description"
+                                   attrs="{'invisible':[('create_index','=',False)]}"
+                                   placeholder="Mô tả chiết suất..."/>
                         </group>
-                        <group>
-                            <field name="description"/>
+
+                        <group string="Vật liệu (Material)">
+                            <field name="create_material"/>
+                            <field name="material_name"
+                                   attrs="{'required':[('create_material','=',True)],
+                                           'invisible':[('create_material','=',False)]}"
+                                   placeholder="VD: MR-8"/>
+                            <field name="material_cid"
+                                   attrs="{'invisible':[('create_material','=',False)]}"
+                                   placeholder="VD: MR8"/>
+                            <field name="material_description"
+                                   attrs="{'invisible':[('create_material','=',False)]}"
+                                   placeholder="Mô tả vật liệu..."/>
                         </group>
                     </group>
                 </sheet>
+
+                <footer>
+                    <button string="Tạo" type="object" name="action_create" class="btn-primary"/>
+                    <button string="Hủy" class="btn-secondary" special="cancel"/>
+                </footer>
             </form>
         </field>
     </record>
 
-    <record id="action_product_material" model="ir.actions.act_window">
-        <field name="name">Product Material</field>
-        <field name="res_model">product.material</field>
-        <field name="view_mode">tree,form</field>
+    <record id="action_product_material_wizard" model="ir.actions.act_window">
+        <field name="name">Tạo chất liệu</field>
+        <field name="res_model">product.material.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_product_material_wizard_form"/>
+        <field name="target">new</field>
+        <field name="context">{}</field>
     </record>
+
+    <menuitem id="menu_create_material"
+          name="Tạo chất liệu"
+          parent="menu_create_product"
+          action="action_product_material_wizard"
+          sequence="40"/>
 </odoo>
