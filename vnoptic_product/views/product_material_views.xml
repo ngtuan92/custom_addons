@@ -55,8 +55,8 @@
     </record>
 
     <menuitem id="menu_create_material"
-          name="Tạo chất liệu"
-          parent="menu_create_product"
+          name="Chất liệu"
+          parent="menu_vnoptic_main"
           action="action_product_material_wizard"
-          sequence="40"/>
+          sequence="26"/>
 </odoo>
