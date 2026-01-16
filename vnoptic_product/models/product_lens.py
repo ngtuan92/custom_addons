@@ -1,4 +1,4 @@
-from odoo import models, fields
+from odoo import models, fields, api
 
 
 class ProductLens(models.Model):
@@ -35,3 +35,17 @@ class ProductLens(models.Model):
 
     coating_ids = fields.Many2many('product.coating', 'lens_coating_rel',
                                    'lens_id', 'coating_id', 'Coatings')
+
+    @api.onchange('index_id')
+    def _onchange_index_update_code(self):
+        """Update product code when lens index changes"""
+        from . import product_code_utils
+        
+        if self.product_tmpl_id and (self.product_tmpl_id.group_id or self.product_tmpl_id.brand_id or self.index_id):
+            code = product_code_utils.generate_product_code(
+                self.env,
+                self.product_tmpl_id.group_id.id if self.product_tmpl_id.group_id else False,
+                self.product_tmpl_id.brand_id.id if self.product_tmpl_id.brand_id else False,
+                self.index_id.id if self.index_id else False
+            )
+            self.product_tmpl_id.default_code = code

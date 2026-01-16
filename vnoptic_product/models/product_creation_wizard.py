@@ -2,6 +2,7 @@ import logging
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from odoo.addons.vnoptic_product.utils import product_code_utils
 
 _logger = logging.getLogger(__name__)
 
@@ -222,6 +223,18 @@ class ProductCreationWizard(models.TransientModel):
         _logger.info("=" * 60)
         
         return result
+
+    @api.onchange('group_id', 'brand_id', 'index_id')
+    def _onchange_generate_code(self):
+        
+        if self.group_id or self.brand_id or self.index_id:
+            code = product_code_utils.generate_product_code(
+                self.env,
+                self.group_id.id if self.group_id else False,
+                self.brand_id.id if self.brand_id else False,
+                self.index_id.id if self.index_id else False
+            )
+            self.cid = code
 
     def action_create_product(self):
         self.ensure_one()

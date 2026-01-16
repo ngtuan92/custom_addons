@@ -37,6 +37,25 @@ class ProductTemplate(models.Model):
     lens_ids = fields.One2many('product.lens', 'product_tmpl_id', 'Lens Details')
     opt_ids = fields.One2many('product.opt', 'product_tmpl_id', 'Optical Details')
 
+    @api.onchange('group_id', 'brand_id')
+    def _onchange_generate_product_code(self):
+        """Auto-generate product code when group or brand changes"""
+        from . import product_code_utils
+        
+        if self.group_id or self.brand_id:
+            # Get lens_index_id from lens_ids if product_type is lens
+            lens_index_id = False
+            if self.product_type == 'lens' and self.lens_ids:
+                lens_index_id = self.lens_ids[0].index_id.id if self.lens_ids[0].index_id else False
+            
+            code = product_code_utils.generate_product_code(
+                self.env,
+                self.group_id.id if self.group_id else False,
+                self.brand_id.id if self.brand_id else False,
+                lens_index_id
+            )
+            self.default_code = code
+
     @api.model
     def create(self, vals):
         product_type = vals.get('product_type', 'lens')

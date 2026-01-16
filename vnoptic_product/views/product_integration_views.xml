@@ -48,7 +48,6 @@
         </field>
     </record>
 
-    <!-- ==================== PHO CL VIEWS ==================== -->
     <record id="product_cl_tree_view" model="ir.ui.view">
         <field name="name">product.cl.tree</field>
         <field name="model">product.cl</field>

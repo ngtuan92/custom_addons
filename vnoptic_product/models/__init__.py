@@ -1,6 +1,7 @@
 from . import product_cl
 from . import product_color_intensity
 from . import product_mirror_coating
+from . import product_brand
 from . import product_coating
 from . import product_coating_wizard
 from . import product_color
