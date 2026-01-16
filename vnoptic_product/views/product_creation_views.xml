@@ -110,16 +110,14 @@
                                     <label for="design1_id"/>
                                     <div class="o_row">
                                         <field name="design1_id"
-                                               widget="many2many_tags"
-                                               options="{'no_open': True}"
+                                               options="{'no_create': True, 'no_open': True}"
                                                placeholder="Chọn thiết kế..."/>
                                     </div>
 
                                     <label for="design2_id"/>
                                     <div class="o_row">
                                         <field name="design2_id"
-                                               widget="many2many_tags"
-                                               options="{'no_open': True}"
+                                               options="{'no_create': True, 'no_open': True}"
                                                placeholder="Chọn thiết kế..."/>
                                     </div>
                                 </group>
@@ -129,29 +127,31 @@
                         <page string="Chất liệu Lens"
                               attrs="{'invisible': [('product_type', '!=', 'lens')]}">
                             <group>
-                                <field name="material_id" string="Chiết suất"
+                                <field name="material_id" string="Vật liệu"
                                        options="{'no_create': True, 'no_open': True}"/>
-                                <field name="uv_id" string="Vật liệu / UV"
+                                <field name="index_id" string="Chiết suất"
                                        options="{'no_create': True, 'no_open': True}"/>
                             </group>
                         </page>
 
-                        <page string="Coating &amp; Tích hợp"
+                        <page string="Tích hợp"
                               attrs="{'invisible': [('product_type', '!=', 'lens')]}">
                             <group>
-                                <group string="Lớp phủ cơ bản">
+                                    <field name="uv_id" string="UV"
+                                           options="{'no_create': True, 'no_open': True}"/>
                                     <field name="cl_pho_id" string="Pho Col"
                                            options="{'no_create': True, 'no_open': True}"/>
                                     <field name="cl_hmc_id" string="HMC"
                                            options="{'no_create': True, 'no_open': True}"/>
-                                </group>
-                                <group string="Lớp phủ bổ sung">
                                     <field name="cl_tint_id" string="Tint Col"
                                            options="{'no_create': True, 'no_open': True}"/>
-                                    <field name="coating_ids" string="Coating khác"
+                                    <field name="color_int_id" string="Độ đậm màu"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="mir_coating_id" string="Màu tráng gương"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="coating_ids" string="Coating"
                                            widget="many2many_tags"
                                            options="{'no_create': True}"/>
-                                </group>
                             </group>
                         </page>
 

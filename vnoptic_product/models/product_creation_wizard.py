@@ -67,11 +67,14 @@ class ProductCreationWizard(models.TransientModel):
     base = fields.Char('Base Curve')
     design1_id = fields.Many2one('product.design', string='Thiết kế 1')
     design2_id = fields.Many2one('product.design', string='Thiết kế 2')
-    material_id = fields.Many2one('product.material', string='Chiết suất')
-    uv_id = fields.Many2one('product.uv', string='Vật liệu/UV')
+    material_id = fields.Many2one('product.material', string='Vật liệu')
+    index_id = fields.Many2one('product.lens.index', string='Chiết suất')
+    uv_id = fields.Many2one('product.uv', string='UV')
     cl_pho_id = fields.Many2one('product.cl', string='Pho Col')
     cl_hmc_id = fields.Many2one('product.cl', string='HMC')
     cl_tint_id = fields.Many2one('product.cl', string='Tint Col')
+    color_int_id = fields.Many2one('product.color.intensity', string='Độ đậm màu')
+    mir_coating_id = fields.Many2one('product.mirror.coating', string='Màu tráng gương')
     coating_ids = fields.Many2many('product.coating', 'wiz_coating_rel', string='Coating')
 
     season = fields.Char('Season')
@@ -336,10 +339,13 @@ class ProductCreationWizard(models.TransientModel):
             'design1_id': self.design1_id.id if self.design1_id else False,
             'design2_id': self.design2_id.id if self.design2_id else False,
             'material_id': self.material_id.id if self.material_id else False,
+            'index_id': self.index_id.id if self.index_id else False,
             'uv_id': self.uv_id.id if self.uv_id else False,
             'cl_pho_id': self.cl_pho_id.id if self.cl_pho_id else False,
             'cl_hmc_id': self.cl_hmc_id.id if self.cl_hmc_id else False,
             'cl_tint_id': self.cl_tint_id.id if self.cl_tint_id else False,
+            'color_int_id': self.color_int_id.id if self.color_int_id else False,
+            'mir_coating_id': self.mir_coating_id.id if self.mir_coating_id else False,
             'coating_ids': [(6, 0, self.coating_ids.ids)] if self.coating_ids else [(6, 0, [])],
         }
 

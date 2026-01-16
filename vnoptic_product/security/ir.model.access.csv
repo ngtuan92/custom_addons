@@ -9,6 +9,8 @@ access_product_cl,product.cl,model_product_cl,base.group_user,1,1,1,1
 access_product_lens_index,product.lens.index,model_product_lens_index,base.group_user,1,1,1,1
 access_product_material,product.material,model_product_material,base.group_user,1,1,1,1
 access_product_coating,product.coating,model_product_coating,base.group_user,1,1,1,1
+access_product_color_intensity,product.color.intensity,model_product_color_intensity,base.group_user,1,1,1,1
+access_product_mirror_coating,product.mirror.coating,model_product_mirror_coating,base.group_user,1,1,1,1
 access_product_frame,product.frame,model_product_frame,base.group_user,1,1,1,1
 access_product_frame_type,product.frame.type,model_product_frame_type,base.group_user,1,1,1,1
 access_product_shape,product.shape,model_product_shape,base.group_user,1,1,1,1
@@ -17,13 +19,15 @@ access_product_temple,product.temple,model_product_temple,base.group_user,1,1,1,
 access_product_lens,product.lens,model_product_lens,base.group_user,1,1,1,1
 access_product_opt,product.opt,model_product_opt,base.group_user,1,1,1,1
 access_product_creation_wizard,product.creation.wizard,model_product_creation_wizard,base.group_user,1,1,1,0
-access_product_creation_wizard,product.creation.wizard,model_product_creation_wizard,base.group_user,1,1,1,0
 access_product_group_wizard,product.group.wizard,model_product_group_wizard,base.group_user,1,1,1,0
 access_product_design_wizard,product.design.wizard,model_product_design_wizard,base.group_user,1,1,1,0
 access_product_material_wizard,product.material.wizard,model_product_material_wizard,base.group_user,1,1,1,0
+access_product_coating_wizard,product.coating.wizard,model_product_coating_wizard,base.group_user,1,1,1,0
+access_product_integration_wizard,product.integration.wizard,model_product_integration_wizard,base.group_user,1,1,1,0
 access_xnk_brand,xnk.brand,xnk_intergration.model_xnk_brand,base.group_user,1,1,1,1
 access_product_color,product.color,model_product_color,base.group_user,1,1,1,1
 access_product_brand_user,access.product.brand.user,model_product_brand,base.group_user,1,1,1,1
 access_product_brand_public,access.product.brand.public,model_product_brand,base.group_public,1,0,0,0
-access_product_material_wizard,product.material.wizard,model_product_material_wizard,base.group_user,1,1,1,0
+
+
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- Tree View -->
-    <record id="product_material_tree_view" model="ir.ui.view">
-        <field name="name">product.material.tree</field>
-        <field name="model">product.material</field>
+    <record id="product_color_intensity_tree_view" model="ir.ui.view">
+        <field name="name">product.color.intensity.tree</field>
+        <field name="model">product.color.intensity</field>
         <field name="arch" type="xml">
-            <tree string="Chất liệu sản phẩm">
+            <tree string="Độ đậm màu">
                 <field name="name"/>
                 <field name="cid"/>
                 <field name="active"/>
@@ -14,11 +14,11 @@
     </record>
 
     <!-- Form View -->
-    <record id="product_material_form_view" model="ir.ui.view">
-        <field name="name">product.material.form</field>
-        <field name="model">product.material</field>
+    <record id="product_color_intensity_form_view" model="ir.ui.view">
+        <field name="name">product.color.intensity.form</field>
+        <field name="model">product.color.intensity</field>
         <field name="arch" type="xml">
-            <form string="Chất liệu sản phẩm">
+            <form string="Độ đậm màu">
                 <sheet>
                     <group>
                         <group>
@@ -36,11 +36,11 @@
     </record>
 
     <!-- Wizard Form -->
-    <record id="product_material_wizard_form_view" model="ir.ui.view">
-        <field name="name">product.material.wizard.form</field>
-        <field name="model">product.material.wizard</field>
+    <record id="product_color_intensity_wizard_form_view" model="ir.ui.view">
+        <field name="name">product.color.intensity.wizard.form</field>
+        <field name="model">product.color.intensity.wizard</field>
         <field name="arch" type="xml">
-            <form string="Tạo chất liệu mới">
+            <form string="Tạo độ đậm màu mới">
                 <sheet>
                     <group>
                         <group>
@@ -53,43 +53,42 @@
                     </group>
                 </sheet>
                 <footer>
-                    <button string="Tạo" type="object" name="action_create_material" class="btn-primary"/>
+                    <button string="Tạo" type="object" name="action_create_color_intensity" class="btn-primary"/>
                     <button string="Hủy" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>
     </record>
 
-    <!-- Action for Material List -->
-    <record id="action_product_material" model="ir.actions.act_window">
-        <field name="name">Chất liệu sản phẩm</field>
-        <field name="res_model">product.material</field>
+    <!-- Action for List -->
+    <record id="action_product_color_intensity" model="ir.actions.act_window">
+        <field name="name">Độ đậm màu</field>
+        <field name="res_model">product.color.intensity</field>
         <field name="view_mode">tree,form</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Chưa có chất liệu nào!
+                Chưa có độ đậm màu nào!
             </p>
             <p>
-                Hãy tạo chất liệu đầu tiên của bạn.<br/>
-                Chất liệu giúp phân loại sản phẩm theo vật liệu (MR-8, Polycarbonate, CR-39...).
+                Hãy tạo độ đậm màu đầu tiên của bạn.<br/>
+                Độ đậm màu giúp phân loại mức độ tối của tròng kính (10%, 25%, 50%, 75%...).
             </p>
         </field>
     </record>
 
     <!-- Action for Wizard -->
-    <record id="action_product_material_wizard" model="ir.actions.act_window">
-        <field name="name">Tạo chất liệu mới</field>
-        <field name="res_model">product.material.wizard</field>
+    <record id="action_product_color_intensity_wizard" model="ir.actions.act_window">
+        <field name="name">Tạo độ đậm màu mới</field>
+        <field name="res_model">product.color.intensity.wizard</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="product_material_wizard_form_view"/>
+        <field name="view_id" ref="product_color_intensity_wizard_form_view"/>
         <field name="target">new</field>
     </record>
 
     <!-- Menu -->
-    <menuitem id="menu_product_material"
-              name="Chất liệu"
+    <menuitem id="menu_product_color_intensity"
+              name="Độ đậm màu"
               parent="menu_vnoptic_main"
-              action="action_product_material"
-              sequence="26"/>
+              action="action_product_color_intensity"
+              sequence="28"/>
 </odoo>
-

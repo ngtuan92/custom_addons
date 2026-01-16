@@ -1,5 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Product Group Tree View -->
+    <record id="view_product_group_tree" model="ir.ui.view">
+        <field name="name">product.group.tree</field>
+        <field name="model">product.group</field>
+        <field name="arch" type="xml">
+            <tree string="Nhóm sản phẩm">
+                <field name="name"/>
+                <field name="cid"/>
+                <field name="group_type_id"/>
+                <field name="activated"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Product Group Form View -->
+    <record id="view_product_group_form" model="ir.ui.view">
+        <field name="name">product.group.form</field>
+        <field name="model">product.group</field>
+        <field name="arch" type="xml">
+            <form string="Nhóm sản phẩm">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="cid"/>
+                        </group>
+                        <group>
+                            <field name="group_type_id" options="{'no_create': True}"/>
+                            <field name="activated"/>
+                        </group>
+                    </group>
+                    <group string="Mô tả">
+                        <field name="description" nolabel="1" widget="text"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
     <!-- Product Group Wizard Form View -->
     <record id="view_product_group_wizard_form" model="ir.ui.view">
         <field name="name">product.group.wizard.form</field>

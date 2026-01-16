@@ -1,15 +1,15 @@
 <odoo>
-    <!-- Consolidated Products Menu -->
+    <!-- Sản phẩm đơn hàng Menu - FIRST to show product list by default -->
     <menuitem id="menu_products_main" 
               name="Sản phẩm đơn hàng"
               parent="menu_vnoptic_main" 
-              sequence="20"/>
+              sequence="10"/>
 
     <!-- Tạo sản phẩm Menu with submenu -->
     <menuitem id="menu_create_product"
               name="Tạo sản phẩm"
               parent="menu_vnoptic_main"
-              sequence="15"/>
+              sequence="20"/>
     
     <menuitem id="menu_create_lens_product"
               name="Tạo Lens"
