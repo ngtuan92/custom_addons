@@ -4,22 +4,7 @@
     'version': '16.0.1.0.0',
     'category': 'Warehouse',
     'summary': 'Inventory Dashboard SPH x CYL',
-    'description': """
-        Inventory Statistic Dashboard for VNOPTIC
-        =========================================
-
-        Tính năng chính:
-        ----------------
-        - Thống kê tồn kho theo ma trận SPH x CYL.
-        - Tự động phân loại Kho Đạt / Kho Lỗi dựa trên cấu hình warehouse_type.
-        - Tích hợp trực tiếp vào menu Inventory (Tồn kho).
-
-        Yêu cầu kỹ thuật:
-        -----------------
-        - SPH/CYL: Hiển thị ma trận động.
-        - Dữ liệu: Lấy từ stock.quant & product.product.
-        - Field warehouse_type: 1 (Đạt), 2 (Lỗi).
-    """,
+    'description': "Inventory Statistic Dashboard for VNOPTIC",
     'author': 'VNOPTIC Team',
     'website': '',
     
