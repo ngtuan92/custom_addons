@@ -5,9 +5,7 @@ class InventoryStatistic(models.TransientModel):
     _name = 'vnoptic.inventory.statistic'
     _description = 'Inventory Statistic Dashboard'
 
-    # ==================================================================================
     # 1. CÁC TRƯỜNG DỮ LIỆU (FIELDS)
-    # ==================================================================================
     
     # --- Tên hiển thị (bắt buộc với một số view) ---
     display_name = fields.Char(default='Dashboard Tồn Kho', compute='_compute_display_name')
@@ -37,9 +35,7 @@ class InventoryStatistic(models.TransientModel):
     good_qty = fields.Integer(string='Kho Đạt', readonly=True)
     defect_qty = fields.Integer(string='Kho Lỗi', readonly=True)
 
-    # ==================================================================================
     # 2. LOGIC TÍNH TOÁN & XỬ LÝ (METHODS)
-    # ==================================================================================
 
     def _compute_display_name(self):
         for rec in self:
@@ -55,7 +51,7 @@ class InventoryStatistic(models.TransientModel):
         """
         self.ensure_one()
         
-        # --- BƯỚC 1: LẤY DANH SÁCH LOCATIONS (ĐẠT / LỖI) ---
+        #  BƯỚC 1: LẤY DANH SÁCH LOCATIONS (ĐẠT / LỖI) 
         # Logic: Dựa vào field warehouse_type (hoặc x_warehouse_type) trong stock.warehouse
         # 1 = Đạt, 2 = Lỗi
         
@@ -178,10 +174,7 @@ class InventoryStatistic(models.TransientModel):
             'view_mode': 'form',
             'target': 'inline',
         }
-
-    # ==================================================================================
     # 3. CÁC HÀM TIỆN ÍCH (UTILS / HELPERS)
-    # ==================================================================================
 
     def _generate_range_sph(self, limit, mode):
         """
