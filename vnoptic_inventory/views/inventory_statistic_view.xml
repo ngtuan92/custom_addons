@@ -32,8 +32,8 @@
                         <group string="Bộ lọc Sản phẩm">
                             <!-- Lấy từ xnk.brand -->
                             <field name="brand_id" options="{'no_create': True}"/>
-                            <!-- Lấy từ product.lens.index -->
-                            <field name="index_id" options="{'no_create': True}"/>
+                            <!-- Chiết suất (Hỗ trợ data ảo nếu DB rỗng) -->
+                            <field name="index_selection"/>
                         </group>
                     </group>
 

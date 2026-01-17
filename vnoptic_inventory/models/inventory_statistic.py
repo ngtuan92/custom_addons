@@ -25,7 +25,7 @@ class InventoryStatistic(models.TransientModel):
 
     # --- Liên kết (Relational Fields) ---
     brand_id = fields.Many2one('xnk.brand', string='Thương hiệu')
-    index_id = fields.Many2one('product.lens.index', string='Chiết suất')
+    index_id = fields.Many2one('product.lens.index', string='Chiết suất mắt kính')
 
     # --- Kết quả hiển thị (Result Fields) ---
     html_matrix = fields.Html(string='Matrix Data', readonly=True, 
@@ -174,6 +174,7 @@ class InventoryStatistic(models.TransientModel):
             'view_mode': 'form',
             'target': 'inline',
         }
+    
     # 3. CÁC HÀM TIỆN ÍCH (UTILS / HELPERS)
 
     def _generate_range_sph(self, limit, mode):
