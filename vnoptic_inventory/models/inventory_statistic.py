@@ -50,6 +50,8 @@ class InventoryStatistic(models.TransientModel):
         4. Xây dựng bảng HTML và gán vào field html_matrix.
         """
         self.ensure_one()
+        # Xóa nội dung HTML cũ để tránh nhân bản bảng khi người dùng bấm nhiều lần
+        self.write({'html_matrix': False})
         
         #  BƯỚC 1: LẤY DANH SÁCH LOCATIONS (ĐẠT / LỖI) 
         # Logic: Dựa vào field warehouse_type (hoặc x_warehouse_type) trong stock.warehouse
@@ -166,14 +168,8 @@ class InventoryStatistic(models.TransientModel):
             'defect_qty': total_defect
         })
 
-        # Trả về action để reload lại đúng trang hiện tại (giữ người dùng ở lại xem kqua)
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': self._name,
-            'res_id': self.id,
-            'view_mode': 'form',
-            'target': 'inline',
-        }
+        # Button type="object" tự reload record, không cần trả về action (tránh sinh thêm view)
+        return True
     
     # 3. CÁC HÀM TIỆN ÍCH (UTILS / HELPERS)
 
