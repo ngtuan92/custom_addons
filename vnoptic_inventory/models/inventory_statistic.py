@@ -11,7 +11,7 @@ class InventoryStatistic(models.TransientModel):
     display_name = fields.Char(default='Dashboard Tồn Kho', compute='_compute_display_name')
     
     # --- Bộ lọc (Filters) ---
-    sph_max = fields.Integer(string='SPH Max', default=4, required=True, 
+    sph_max = fields.Integer(string='SPH Maxx', default=4, required=True, 
                             help="Nhập giá trị tuyệt đối. Ví dụ nhập 4 -> Phạm vi sẽ là 0..4 hoặc -4..0")
     
     cyl_max = fields.Integer(string='CYL Max', default=4, required=True,
@@ -300,11 +300,11 @@ class InventoryStatistic(models.TransientModel):
             
             body_rows += "</tr>"
 
-        # Container với viewport cố định ~4x4 (450px × 300px)
-        # 4 cột × 90px + SPH 80px = 440px
-        # 4 dòng × 45px + header 45px = 225px
+        # Container với viewport lớn hơn để hiển thị nhiều cell cùng lúc
+        # Max-width: 900px (~10 cột CYL), Max-height: 600px (~13 dòng SPH)
+        # Scroll tự động xuất hiện khi data lớn hơn (ví dụ 17x17 với range 0 đến -4)
         return f"""
-        <div style="overflow: auto; max-width: 450px; max-height: 280px; border: 2px solid #dee2e6;">
+        <div style="overflow: auto; max-width: 900px; max-height: 600px; border: 2px solid #dee2e6;">
             <table style="border-collapse: separate; border-spacing: 0; table-layout: fixed;">
                 <thead>
                     <tr>
