@@ -8,6 +8,7 @@
             <tree string="Thiết kế sản phẩm">
                 <field name="name"/>
                 <field name="cid"/>
+                <field name="design_type"/>
                 <field name="active"/>
             </tree>
         </field>
@@ -24,10 +25,11 @@
                         <group>
                             <field name="name"/>
                             <field name="cid"/>
-                            <field name="active"/>
+                            <field name="design_type"/>
                         </group>
                         <group>
                             <field name="description"/>
+                            <field name="active"/>
                         </group>
                     </group>
                 </sheet>
@@ -45,8 +47,7 @@
                 Chưa có thiết kế nào!
             </p>
             <p>
-                Hãy tạo thiết kế đầu tiên của bạn.<br/>
-                Thiết kế giúp phân loại Lens/OPT theo mẫu (SF, PRO, ASPH...).
+                Thêm thiết kế cho Lens tại đây.
             </p>
         </field>
     </record>

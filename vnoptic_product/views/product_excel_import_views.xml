@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Preview Line Tree View -->
+    <record id="view_product_excel_preview_line_tree" model="ir.ui.view">
+        <field name="name">product.excel.preview.line.tree</field>
+        <field name="model">product.excel.preview.line</field>
+        <field name="arch" type="xml">
+            <tree string="Preview Data" create="false" edit="false" delete="false" 
+                  decoration-danger="has_error==True">
+                <field name="row_number"/>
+                <field name="generated_code" string="Mã tự động"/>
+                <field name="full_name"/>
+                <field name="group"/>
+                <field name="brand"/>
+                <field name="index"/>
+                <field name="design1"/>
+                <field name="material"/>
+                <field name="sku"/>
+                <field name="frame_type"/>
+                <field name="retail_price" sum="Total"/>
+                <field name="wholesale_price"/>
+                <field name="has_error" invisible="1"/>
+                <field name="error_message" optional="hide"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- Form View -->
+    <record id="view_product_excel_import_form" model="ir.ui.view">
+        <field name="name">product.excel.import.form</field>
+        <field name="model">product.excel.import</field>
+        <field name="arch" type="xml">
+            <form string="Import Products from Excel">
+                <header>
+                    <field name="state" widget="statusbar" statusbar_visible="upload,preview,done"/>
+                </header>
+                
+                <sheet>
+                    <!-- UPLOAD STATE -->
+                    <group attrs="{'invisible': [('state', '!=', 'upload')]}">
+                        <group>
+                            <field name="excel_file" filename="file_name" required="1"/>
+                            <field name="file_name" invisible="1"/>
+                        </group>
+                        <group attrs="{'invisible': [('excel_file', '=', False)]}">
+                            <field name="product_type" readonly="1"/>
+                        </group>
+                    </group>
+                    
+                    <!-- PREVIEW STATE -->
+                    <notebook attrs="{'invisible': [('state', '!=', 'preview')]}">
+                        <page string="Preview Data">
+                            <group>
+                                <field name="product_type" readonly="1"/>
+                            </group>
+                            <separator string="Dữ liệu từ Excel (20 dòng/trang)"/>
+                            <field name="preview_line_ids" nolabel="1">
+                                <tree string="Preview Data" create="false" edit="false" delete="false"
+                                      decoration-danger="has_error==True" limit="20">
+                                    <field name="row_number"/>
+                                    <field name="generated_code" string="Mã tự động"/>
+                                    <field name="full_name"/>
+                                    <field name="group"/>
+                                    <field name="brand"/>
+                                    <field name="index"/>
+                                    <field name="design1"/>
+                                    <field name="material"/>
+                                    <field name="sku"/>
+                                    <field name="frame_type"/>
+                                    <field name="retail_price" sum="Total"/>
+                                    <field name="wholesale_price"/>
+                                    <field name="has_error" invisible="1"/>
+                                    <field name="error_message" optional="hide"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Raw Data (Debug)" groups="base.group_no_one">
+                            <field name="preview_data" widget="ace" 
+                                   options="{'mode': 'json'}" readonly="1" nolabel="1"/>
+                        </page>
+                        <page string="Validation Errors" 
+                              attrs="{'invisible': [('error_log', '=', False)]}">
+                            <field name="error_log" widget="text" readonly="1" nolabel="1"/>
+                        </page>
+                    </notebook>
+                    
+                    <!-- DONE STATE -->
+                    <group attrs="{'invisible': [('state', '!=', 'done')]}">
+                        <group>
+                            <field name="success_count" readonly="1"/>
+                            <field name="error_count" readonly="1"/>
+                        </group>
+                    </group>
+                    <group attrs="{'invisible': ['|', ('state', '!=', 'done'), ('error_log', '=', False)]}">
+                        <separator string="Result"/>
+                        <field name="error_log" widget="text" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+                
+                <footer>
+                    <!-- Upload state buttons -->
+                    <button name="action_parse_excel" type="object" 
+                            string="Next: Preview" 
+                            attrs="{'invisible': [('state', '!=', 'upload')]}"
+                            class="btn-primary"/>
+                    
+                    <!-- Preview state buttons -->
+                    <button name="action_confirm_import" type="object" 
+                            string="Confirm Import" 
+                            attrs="{'invisible': [('state', '!=', 'preview')]}"
+                            class="btn-primary"
+                            confirm="Are you sure you want to import these products? This action cannot be undone."/>
+                    <button name="action_back_to_upload" type="object" 
+                            string="Back" 
+                            attrs="{'invisible': [('state', '!=', 'preview')]}"
+                            class="btn-secondary"/>
+                    
+                    <!-- Done state button -->
+                    <button string="Close" special="cancel" 
+                            attrs="{'invisible': [('state', '!=', 'done')]}"
+                            class="btn-primary"/>
+                    
+                    <button string="Cancel" class="btn-secondary" special="cancel"
+                            attrs="{'invisible': [('state', '=', 'done')]}"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    
+    <!-- Action -->
+    <record id="action_import_excel_products" model="ir.actions.act_window">
+        <field name="name">Import Products from Excel</field>
+        <field name="res_model">product.excel.import</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_product_excel_import_form"/>
+    </record>
+    
+    <!-- Menu Item -->
+    <menuitem id="menu_import_excel_products"
+              name="Import từ Excel"
+              parent="menu_products_main"
+              action="action_import_excel_products"
+              sequence="101"/>
+</odoo>
+

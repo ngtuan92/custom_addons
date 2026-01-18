@@ -56,8 +56,8 @@
                             <field name="material_lens_id"/>
                             <field name="color_lens_id"/>
                             <field name="color"/>
-                            <field name="color_front"/>
-                            <field name="color_temple"/>
+                            <field name="color_front_id"/>
+                            <field name="color_temple_id"/>
                         </group>
                     </group>
                     <group string="Coatings &amp; Materials">

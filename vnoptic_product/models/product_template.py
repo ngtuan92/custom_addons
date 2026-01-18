@@ -40,7 +40,7 @@ class ProductTemplate(models.Model):
     @api.onchange('group_id', 'brand_id')
     def _onchange_generate_product_code(self):
         """Auto-generate product code when group or brand changes"""
-        from . import product_code_utils
+        from odoo.addons.vnoptic_product import utils as vnoptic_utils
         
         if self.group_id or self.brand_id:
             # Get lens_index_id from lens_ids if product_type is lens
@@ -48,7 +48,7 @@ class ProductTemplate(models.Model):
             if self.product_type == 'lens' and self.lens_ids:
                 lens_index_id = self.lens_ids[0].index_id.id if self.lens_ids[0].index_id else False
             
-            code = product_code_utils.generate_product_code(
+            code = vnoptic_utils.product_code_utils.generate_product_code(
                 self.env,
                 self.group_id.id if self.group_id else False,
                 self.brand_id.id if self.brand_id else False,

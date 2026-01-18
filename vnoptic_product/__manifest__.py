@@ -1,9 +1,12 @@
 {
     "name": "VNOPTIC Products",
-    "version": "16.0.1.0.0",
+    "version": "16.0.1.0.6",
     "summary": "Lens & Optical product management",
     "author": "Your Company",
     "depends": ["product", "base", "xnk_intergration"],
+    "external_dependencies": {
+        "python": ["openpyxl"],
+    },
     "data": [
         'data/product_group_type_data.xml',
         'security/ir.model.access.csv',
@@ -17,11 +20,12 @@
         'views/product_color_views.xml',
         'views/product_coating_views.xml',
         'views/product_integration_views.xml',
-        'views/product_design_views.xml',
         'views/product_material_views.xml',
+        'views/product_lens_index_views.xml',
         'views/product_creation_views.xml',
         'views/product_actions.xml',
         'views/product_group_views.xml',
+        'views/product_excel_import_views.xml',
         'views/test_action.xml',
         'views/menu.xml',
     ],

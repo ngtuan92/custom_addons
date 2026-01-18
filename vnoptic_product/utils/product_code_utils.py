@@ -134,3 +134,94 @@ def generate_product_code(env, group_id, brand_id, lens_index_id):
     _logger.info(f"Generated product code: {final_code} (prefix: {prefix}, sequence: {next_seq})")
     
     return final_code
+
+
+def generate_product_codes_batch(env, code_requests):
+    """
+    Generate product codes for multiple products at once.
+    
+    This is much more efficient than calling generate_product_code() in a loop
+    because it:
+    - Queries the database once per unique prefix instead of once per product
+    - Pre-calculates all sequences before any products are created
+    
+    Args:
+        env: Odoo environment
+        code_requests: List of tuples (group_id, brand_id, lens_index_id)
+    
+    Returns:
+        List of generated codes in the same order as code_requests
+    """
+    if not code_requests:
+        return []
+    
+    # Cache lens index CIDs to avoid repeated lookups
+    lens_index_cache = {}
+    unique_lens_ids = set(req[2] for req in code_requests if req[2])
+    if unique_lens_ids:
+        lens_indexes = env['product.lens.index'].browse(list(unique_lens_ids))
+        for li in lens_indexes:
+            lens_index_cache[li.id] = li.cid[:3].ljust(3, '0') if li.cid else '000'
+    
+    # Build prefixes for all requests
+    prefix_map = {}  # prefix -> list of request indices
+    for idx, (group_id, brand_id, lens_index_id) in enumerate(code_requests):
+        # Build prefix
+        group_part = f"{group_id:02d}" if group_id else "00"
+        brand_part = f"{brand_id:03d}" if brand_id else "000"
+        index_part = lens_index_cache.get(lens_index_id, "000") if lens_index_id else "000"
+        prefix = f"{group_part}{brand_part}{index_part}"
+        
+        if prefix not in prefix_map:
+            prefix_map[prefix] = []
+        prefix_map[prefix].append(idx)
+    
+    # Query existing codes for all prefixes at once
+    ProductTemplate = env['product.template']
+    all_prefixes = list(prefix_map.keys())
+    
+    # Build OR domain for all prefixes
+    domains = [('default_code', '=like', f'{prefix}%') for prefix in all_prefixes]
+    if len(domains) == 1:
+        combined_domain = domains[0]
+    else:
+        combined_domain = ['|'] * (len(domains) - 1) + domains
+    
+    existing_codes = ProductTemplate.search([combined_domain]).mapped('default_code')
+    
+    # Group existing codes by prefix
+    prefix_sequences = {prefix: [] for prefix in all_prefixes}
+    for code in existing_codes:
+        if code and len(code) >= 13:
+            code_prefix = code[:8]
+            if code_prefix in prefix_sequences:
+                seq = code[8:13]
+                prefix_sequences[code_prefix].append(seq)
+    
+    # Generate codes for each request
+    result_codes = [None] * len(code_requests)
+    
+    for prefix, indices in prefix_map.items():
+        # Get sequences for this prefix
+        sequences = prefix_sequences[prefix]
+        
+        # Find starting sequence
+        if sequences:
+            sequences.sort()
+            current_seq = sequences[-1]
+        else:
+            current_seq = None
+        
+        # Generate codes for all products with this prefix
+        for idx in indices:
+            if current_seq is None:
+                next_seq = "00000"
+            else:
+                next_seq = get_next_sequence(current_seq)
+            
+            result_codes[idx] = f"{prefix}{next_seq}"
+            current_seq = next_seq
+    
+    _logger.info(f"Batch generated {len(result_codes)} product codes for {len(prefix_map)} unique prefixes")
+    
+    return result_codes

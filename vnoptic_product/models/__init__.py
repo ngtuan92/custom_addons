@@ -8,14 +8,16 @@ from . import product_color
 from . import product_creation_wizard
 from . import product_group_wizard
 from . import product_integration_wizard
+from . import product_excel_preview_line
 from . import product_design
-from . import product_design_wizard
+from . import product_excel_import
 from . import product_frame
 from . import product_frame_type
 from . import product_group
 from . import product_group_type
 from . import product_lens
 from . import product_lens_index
+from . import product_lens_index_wizard
 from . import product_material
 from . import product_material_wizard
 from . import product_opt
@@ -26,4 +28,3 @@ from . import product_temple
 from . import product_uv
 from . import product_ve
 from . import product_warranty
-from . import product_brand

@@ -23,14 +23,17 @@ class ProductOpt(models.Model):
     bridge_width = fields.Integer('Bridge Width')
 
     color = fields.Char('Color', size=50)
-    color_front = fields.Char('Front Color', size=100)
-    color_temple = fields.Char('Temple Color', size=100)
+    color_front_id = fields.Many2one('product.cl', 'Front Color')
+    color_temple_id = fields.Many2one('product.cl', 'Temple Color')
 
+    # Optical design fields - Many2one to lookup tables
     frame_id = fields.Many2one('product.frame', 'Frame')
     frame_type_id = fields.Many2one('product.frame.type', 'Frame Type')
     shape_id = fields.Many2one('product.shape', 'Shape')
     ve_id = fields.Many2one('product.ve', 'VE')
     temple_id = fields.Many2one('product.temple', 'Temple')
+    
+    # Material fields
     material_ve_id = fields.Many2one('product.material', 'VE Material')
     material_temple_tip_id = fields.Many2one('product.material', 'Temple Tip Material')
     material_lens_id = fields.Many2one('product.material', 'Lens Material')

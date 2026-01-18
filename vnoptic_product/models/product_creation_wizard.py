@@ -2,7 +2,7 @@ import logging
 
 from odoo import api, fields, models
 from odoo.exceptions import UserError
-from odoo.addons.vnoptic_product.utils import product_code_utils
+from odoo.addons.vnoptic_product import utils as vnoptic_utils
 
 _logger = logging.getLogger(__name__)
 
@@ -42,6 +42,13 @@ class ProductCreationWizard(models.TransientModel):
     
     # Tax and currency
     x_tax_percent = fields.Float('Thuế (%)')
+    currency_selection = fields.Selection([
+        ('vnd', 'VND'),
+        ('usd', 'USD'),
+        ('japan', 'Japan (YÊN)'),
+        ('china', 'China (TỆ)')
+    ], string='Đơn vị ngoại tệ', default='vnd')
+    x_currency_zone_value = fields.Float('Tỉ giá (Exchange Rate)', default=1.0)
     currency_id = fields.Many2one('res.currency', string='Đơn vị nguyên tệ')
     currency_zone_id = fields.Many2one('res.currency', string='Khu vực tiền tệ')
     
@@ -74,21 +81,24 @@ class ProductCreationWizard(models.TransientModel):
     cl_pho_id = fields.Many2one('product.cl', string='Pho Col')
     cl_hmc_id = fields.Many2one('product.cl', string='HMC')
     cl_tint_id = fields.Many2one('product.cl', string='Tint Col')
-    color_int_id = fields.Many2one('product.color.intensity', string='Độ đậm màu')
-    mir_coating_id = fields.Many2one('product.mirror.coating', string='Màu tráng gương')
+    color_int = fields.Char('Độ đậm màu', size=50)
+    mir_coating = fields.Char('Màu tráng gương', size=50)
     coating_ids = fields.Many2many('product.coating', 'wiz_coating_rel', string='Coating')
 
     season = fields.Char('Season')
     sku = fields.Char('SKU')
     model_name = fields.Char('Model')
     serial = fields.Char('Serial')
+    color_code = fields.Char('Color Code')
+    original_code = fields.Char('Mã gốc')
 
-    frame_type_id = fields.Many2one('product.frame.type', string='Kiểu gọng')
-    gender = fields.Selection([('1', 'Nam'), ('2', 'Nữ'), ('3', 'Unisex')], 'Giới tính')
-    frame_id = fields.Many2one('product.frame', string='Loại gọng')
+    # OPT specific fields - Many2one to lookup tables
+    frame_id = fields.Many2one('product.frame', string='Kiểu gọng')
+    frame_type_id = fields.Many2one('product.frame.type', string='Loại gọng')
     ve_id = fields.Many2one('product.ve', string='Ve')
     shape_id = fields.Many2one('product.shape', string='Kiểu dáng mặt kính')
     temple_id = fields.Many2one('product.temple', string='Chuôi càng')
+    gender = fields.Selection([('1', 'Nam'), ('2', 'Nữ'), ('3', 'Unisex')], 'Giới tính')
 
     material_front_ids = fields.Many2many(
         'product.material', 'wiz_material_front_rel', 'wizard_id', 'material_id', string='Mặt trước')
@@ -97,10 +107,11 @@ class ProductCreationWizard(models.TransientModel):
     material_temple_tip_id = fields.Many2one('product.material', string='Chuôi càng')
     material_lens_id = fields.Many2one('product.material', string='Mắt kính')
     material_ve_id = fields.Many2one('product.material', string='Ve kính')
+    coating_opt = fields.Many2one('product.coating', string='Lớp mạ')
 
-    color_front = fields.Char('Màu mặt trước')
-    color_temple = fields.Char('Màu càng kính')
-    color_lens_id = fields.Many2one('product.cl', string='Màu mặt kính')
+    color_front_id = fields.Many2one('product.cl', string='Màu mặt trước')
+    color_temple_id = fields.Many2one('product.cl', string='Màu càng kính')
+    color_lens_id = fields.Many2one('product.cl', string='Màu mắt kính')
 
     temple_width = fields.Integer('Dài gọng')
     lens_height = fields.Integer('Cao mắt')
@@ -155,7 +166,6 @@ class ProductCreationWizard(models.TransientModel):
         _logger.info("=" * 60)
         _logger.info(f"_onchange_product_type triggered: {self.product_type}")
 
-        # Set domain for group_id based on product_type
         result = {}
         if self.product_type:
             group_type_mapping = {
@@ -224,17 +234,47 @@ class ProductCreationWizard(models.TransientModel):
         
         return result
 
+
     @api.onchange('group_id', 'brand_id', 'index_id')
     def _onchange_generate_code(self):
         
         if self.group_id or self.brand_id or self.index_id:
-            code = product_code_utils.generate_product_code(
+            code = vnoptic_utils.product_code_utils.generate_product_code(
                 self.env,
                 self.group_id.id if self.group_id else False,
                 self.brand_id.id if self.brand_id else False,
                 self.index_id.id if self.index_id else False
             )
             self.cid = code
+    
+    @api.onchange('currency_selection')
+    def _onchange_currency_selection(self):
+        if self.currency_selection:
+            currency_map = {
+                'vnd': 'VND',
+                'usd': 'USD',
+                'japan': 'JPY',
+                'china': 'CNY'
+            }
+            currency_code = currency_map.get(self.currency_selection)
+            if currency_code:
+                currency = self.env['res.currency'].sudo().search([('name', '=', currency_code)], limit=1)
+                if currency:
+                    self.currency_zone_id = currency.id
+                    # Gợi ý tỉ giá mặc định nếu cần (ví dụ: VND là 1)
+                    if self.currency_selection == 'vnd':
+                        self.x_currency_zone_value = 1.0
+
+    @api.onchange('design_id')
+    def _onchange_design_id(self):
+        """Populate optical fields from selected design"""
+        if self.design_id and self.design_id.design_type == 'opt':
+            self.frame = self.design_id.frame or ''
+            self.frame_type = self.design_id.frame_type or ''
+            self.shape = self.design_id.shape or ''
+            self.ve = self.design_id.ve or ''
+            self.temple = self.design_id.temple or ''
+
 
     def action_create_product(self):
         self.ensure_one()
@@ -247,7 +287,34 @@ class ProductCreationWizard(models.TransientModel):
         if not self.name or not self.eng_name:
             raise UserError("Vui lòng nhập tên sản phẩm và tên tiếng Anh!")
 
+        if not self.cid:
+            code = vnoptic_utils.product_code_utils.generate_product_code(
+                self.env,
+                self.group_id.id if self.group_id else False,
+                self.brand_id.id if self.brand_id else False,
+                self.index_id.id if self.index_id else False
+            )
+            self.cid = code
+
         # Chuẩn bị data chung cho product.template
+        # Chuẩn bị data chung cho product.template
+        # Tìm hoặc tạo thuế dựa trên phần trăm
+        tax_id = False
+        if self.x_tax_percent:
+            tax_name = f"Tax {self.x_tax_percent}%"
+            tax = self.env['account.tax'].sudo().search([
+                ('name', '=', tax_name),
+                ('type_tax_use', '=', 'sale')
+            ], limit=1)
+            if not tax:
+                tax = self.env['account.tax'].sudo().create({
+                    'name': tax_name,
+                    'amount': self.x_tax_percent,
+                    'amount_type': 'percent',
+                    'type_tax_use': 'sale'
+                })
+            tax_id = tax.id
+
         vals = {
             'name': self.name,
             'default_code': self.cid or '',
@@ -257,7 +324,7 @@ class ProductCreationWizard(models.TransientModel):
             
             # Price fields
             'list_price': self.rt_price or 0.0,  # Retail price = Sales Price
-            'standard_price': self.x_ct_price or 0.0,  # Cost price
+            'standard_price': (self.x_or_price or 0.0) * (self.x_currency_zone_value or 1.0),  # Cost price quy đổi sang VND
             'x_ws_price': self.x_ws_price or 0.0,
             'x_ct_price': self.x_ct_price or 0.0,
             'x_or_price': self.x_or_price or 0.0,
@@ -266,6 +333,7 @@ class ProductCreationWizard(models.TransientModel):
             
             # Tax
             'x_tax_percent': self.x_tax_percent or 0.0,
+            'taxes_id': [(6, 0, [tax_id])] if tax_id else False,
             
             'uom_id': self.env.ref('uom.product_uom_unit').id,
             'uom_po_id': self.env.ref('uom.product_uom_unit').id,
@@ -288,16 +356,27 @@ class ProductCreationWizard(models.TransientModel):
             
             # Currency
             'currency_zone_id': self.currency_zone_id.id if self.currency_zone_id else False,
+            'x_currency_zone_code': self.currency_zone_id.name if self.currency_zone_id else '',
+            'x_currency_zone_value': self.x_currency_zone_value or 1.0,
             
             # Unit and other info
             'unit': self.unit or 'Chiếc',
+            'eng_name': self.eng_name,
+            'x_eng_name': self.eng_name,
+            'trade_name': self.trade_name,
+            'x_trade_name': self.trade_name,
             'uses': self.uses or '',
+            'x_uses': self.uses or '',
             'guide': self.guide or '',
+            'x_guide': self.guide or '',
             'warning': self.warning or '',
+            'x_warning': self.warning or '',
             'preserve': self.preserve or '',
+            'x_preserve': self.preserve or '',
 
             # Mô tả
             'description': self.description or '',
+            'x_note_long': self.description or '',
             'description_sale': self.uses or '',
         }
 
@@ -324,7 +403,6 @@ class ProductCreationWizard(models.TransientModel):
         }
 
     def _get_category_id(self):
-        """Lấy category dựa trên product_type"""
         category_mapping = {
             'lens': 'Lens',
             'opt': 'Optical Frame',
@@ -340,7 +418,6 @@ class ProductCreationWizard(models.TransientModel):
         return category.id
 
     def _create_lens_record(self, product):
-        """Tạo bản ghi product.lens"""
         vals = {
             'product_tmpl_id': product.id,
             'sph': self.sph or '',
@@ -357,8 +434,8 @@ class ProductCreationWizard(models.TransientModel):
             'cl_pho_id': self.cl_pho_id.id if self.cl_pho_id else False,
             'cl_hmc_id': self.cl_hmc_id.id if self.cl_hmc_id else False,
             'cl_tint_id': self.cl_tint_id.id if self.cl_tint_id else False,
-            'color_int_id': self.color_int_id.id if self.color_int_id else False,
-            'mir_coating_id': self.mir_coating_id.id if self.mir_coating_id else False,
+            'color_int': self.color_int or '',
+            'mir_coating': self.mir_coating or '',
             'coating_ids': [(6, 0, self.coating_ids.ids)] if self.coating_ids else [(6, 0, [])],
         }
 
@@ -383,9 +460,9 @@ class ProductCreationWizard(models.TransientModel):
             'material_temple_tip_id': self.material_temple_tip_id.id if self.material_temple_tip_id else False,
             'material_lens_id': self.material_lens_id.id if self.material_lens_id else False,
             'material_ve_id': self.material_ve_id.id if self.material_ve_id else False,
-            'color_front': self.color_front or '',
+            'color_front_id': self.color_front_id.id if self.color_front_id else False,
             'color_lens_id': self.color_lens_id.id if self.color_lens_id else False,
-            'color_temple': self.color_temple or '',
+            'color_temple_id': self.color_temple_id.id if self.color_temple_id else False,
             'temple_width': self.temple_width or 0,
             'lens_height': self.lens_height or 0,
             'lens_width': self.lens_width or 0,

@@ -10,3 +10,10 @@ class ProductDesign(models.Model):
     description = fields.Text('Description', size=100)
     cid = fields.Char('Design Code', size=5)
     active = fields.Boolean('Active', default=True)
+    
+    # Design Type
+    design_type = fields.Selection([
+        ('lens', 'Lens'),
+        ('opt', 'Optical'),
+        ('other', 'Khác')
+    ], string='Loại thiết kế', default='lens')

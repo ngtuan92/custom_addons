@@ -20,9 +20,9 @@ class ProductLens(models.Model):
     polarized = fields.Char('Polarized', size=50)
     prism_base = fields.Char('Prism Base', size=50)
     
-    # Many2one relationships
-    color_int_id = fields.Many2one('product.color.intensity', string='Độ đậm màu')
-    mir_coating_id = fields.Many2one('product.mirror.coating', string='Màu tráng gương')
+    # String fields for direct input
+    color_int = fields.Char('Độ đậm màu', size=50)
+    mir_coating = fields.Char('Màu tráng gương', size=50)
 
     design1_id = fields.Many2one('product.design', string='Design1')
     design2_id = fields.Many2one('product.design', string='Design2')
@@ -39,10 +39,10 @@ class ProductLens(models.Model):
     @api.onchange('index_id')
     def _onchange_index_update_code(self):
         """Update product code when lens index changes"""
-        from . import product_code_utils
+        from odoo.addons.vnoptic_product import utils as vnoptic_utils
         
         if self.product_tmpl_id and (self.product_tmpl_id.group_id or self.product_tmpl_id.brand_id or self.index_id):
-            code = product_code_utils.generate_product_code(
+            code = vnoptic_utils.product_code_utils.generate_product_code(
                 self.env,
                 self.product_tmpl_id.group_id.id if self.product_tmpl_id.group_id else False,
                 self.product_tmpl_id.brand_id.id if self.product_tmpl_id.brand_id else False,

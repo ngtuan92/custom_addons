@@ -16,7 +16,7 @@
                             </group>
 
                             <group string="Thông tin cơ bản">
-                                <field name="cid" string="Ký hiệu viết tắt" readonly="1"/>
+                                <field name="cid" string="Ký hiệu viết tắt" readonly="1" force_save="1"/>
                                 <field name="name" string="Tên đầy đủ" required="1"/>
                                 <field name="eng_name" string="Tên Tiếng anh" required="1"/>
                                 <field name="trade_name" string="Tên Thương mại"/>
@@ -32,8 +32,7 @@
                                        options="{'no_create': True, 'no_open': True}"/>
                                 <field name="country_id" string="Xuất xứ"
                                        options="{'no_create': True, 'no_open': True}"/>
-                                <field name="status_product_id" string="Trạng thái"
-                                       options="{'no_create': True, 'no_open': True}"/>
+
                             </group>
                         </group>
                     </group>
@@ -61,31 +60,31 @@
 
                         <page string="Giá &amp; Thuế">
                             <group>
-                                <group string="Giá bán">
+                                <group>
                                     <field name="rt_price" string="Giá bán lẻ (Retail)"/>
                                     <field name="x_ws_price" string="Giá sỉ (Wholesale)"/>
                                     <field name="x_ws_price_max" string="Giá sỉ tối đa"/>
                                     <field name="x_ws_price_min" string="Giá sỉ tối thiểu"/>
                                 </group>
-                                <group string="Giá vốn &amp; Thuế">
+                                <group>
+                                    <field name="currency_selection" string="Ngoại tệ"/>
+                                    <field name="x_currency_zone_value" string="Tỉ giá"/>
                                     <field name="x_ct_price" string="Giá vốn (Cost)"/>
                                     <field name="x_or_price" string="Giá nguyên tệ (Original)"/>
                                     <field name="x_tax_percent" string="Thuế (%)"/>
-                                    <field name="currency_zone_id" string="Khu vực tiền tệ"
-                                           options="{'no_create': True, 'no_open': True}"/>
                                 </group>
                             </group>
                         </page>
 
                         <page string="Bảo hành">
                             <group>
-                                <group string="Bảo hành chính">
+                                <group>
                                     <field name="warranty_id" string="Bảo hành chính"
                                            options="{'no_create': True, 'no_open': True}"/>
                                     <field name="warranty_detail_id" string="Bảo hành chi tiết"
                                            options="{'no_create': True, 'no_open': True}"/>
                                 </group>
-                                <group string="Bảo hành khác">
+                                <group>
                                     <field name="warranty_retail_id" string="Bảo hành bán lẻ"
                                            options="{'no_create': True, 'no_open': True}"/>
                                     <field name="warranty_supplier_id" string="Bảo hành hãng"
@@ -97,16 +96,15 @@
                         <page string="Thiết kế Lens"
                               attrs="{'invisible': [('product_type', '!=', 'lens')]}">
                             <group>
-                                <group string="Thông số kỹ thuật">
+                                <group>
                                     <field name="sph" string="SPH"/>
                                     <field name="cyl" string="CYL"/>
                                     <field name="diameter" string="Đường kính"/>
                                     <field name="prism" string="Prism"/>
                                 </group>
-                                <group string="Thông số bổ sung">
+                                <group>
                                     <field name="len_add" string="ADD"/>
                                     <field name="base" string="Base Curve"/>
-
                                     <label for="design1_id"/>
                                     <div class="o_row">
                                         <field name="design1_id"
@@ -145,10 +143,8 @@
                                            options="{'no_create': True, 'no_open': True}"/>
                                     <field name="cl_tint_id" string="Tint Col"
                                            options="{'no_create': True, 'no_open': True}"/>
-                                    <field name="color_int_id" string="Độ đậm màu"
-                                           options="{'no_create': True, 'no_open': True}"/>
-                                    <field name="mir_coating_id" string="Màu tráng gương"
-                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="color_int" string="Độ đậm màu" placeholder="Nhập độ đậm màu..."/>
+                                    <field name="mir_coating" string="Màu tráng gương" placeholder="Nhập màu tráng gương..."/>
                                     <field name="coating_ids" string="Coating"
                                            widget="many2many_tags"
                                            options="{'no_create': True}"/>
@@ -158,13 +154,15 @@
                         <page string="Thông tin Gọng"
                               attrs="{'invisible': [('product_type', '!=', 'opt')]}">
                             <group>
-                                <group string="Mã sản phẩm">
+                                <group>
                                     <field name="season" string="Season"/>
                                     <field name="sku" string="SKU"/>
+                                    <field name="color_code" string="Color Code"/>
                                 </group>
-                                <group string="Model">
+                                <group>
                                     <field name="model_name" string="Model"/>
                                     <field name="serial" string="Serial"/>
+                                    <field name="original_code" string="Mã gốc"/>
                                 </group>
                             </group>
                         </page>
@@ -173,10 +171,10 @@
                               attrs="{'invisible': [('product_type', '!=', 'opt')]}">
                             <group>
                                 <group string="Loại gọng">
-                                    <field name="frame_type_id" string="Kiểu gọng"
+                                    <field name="frame_id" string="Kiểu gọng"
                                            options="{'no_create': True, 'no_open': True}"/>
                                     <field name="gender" string="Giới tính"/>
-                                    <field name="frame_id" string="Loại gọng"
+                                    <field name="frame_type_id" string="Loại gọng"
                                            options="{'no_create': True, 'no_open': True}"/>
                                 </group>
                                 <group string="Chi tiết">
@@ -193,7 +191,7 @@
                         <page string="Chất liệu Gọng"
                               attrs="{'invisible': [('product_type', '!=', 'opt')]}">
                             <group>
-                                <group string="Chất liệu chính">
+                                <group>
                                     <field name="material_front_ids" string="Mặt trước"
                                            widget="many2many_tags"
                                            options="{'no_create': True}"/>
@@ -203,10 +201,12 @@
                                     <field name="material_temple_tip_id" string="Chuôi càng"
                                            options="{'no_create': True, 'no_open': True}"/>
                                 </group>
-                                <group string="Chất liệu phụ">
+                                <group>
                                     <field name="material_lens_id" string="Mắt kính"
                                            options="{'no_create': True, 'no_open': True}"/>
                                     <field name="material_ve_id" string="Ve kính"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="coating_opt" string="Lớp mạ"
                                            options="{'no_create': True, 'no_open': True}"/>
                                 </group>
                             </group>
@@ -216,11 +216,13 @@
                               attrs="{'invisible': [('product_type', '!=', 'opt')]}">
                             <group>
                                 <group>
-                                    <field name="color_front" string="Màu mặt trước"/>
-                                    <field name="color_temple" string="Màu càng kính"/>
+                                    <field name="color_front_id" string="Màu mặt trước"
+                                           options="{'no_create': True, 'no_open': True}"/>
+                                    <field name="color_temple_id" string="Màu càng kính"
+                                           options="{'no_create': True, 'no_open': True}"/>
                                 </group>
                                 <group>
-                                    <field name="color_lens_id" string="Màu mặt kính"
+                                    <field name="color_lens_id" string="Màu mắt kính"
                                            options="{'no_create': True, 'no_open': True}"/>
                                 </group>
                             </group>

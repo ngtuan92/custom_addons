@@ -38,9 +38,5 @@ class XnkWarranty(models.Model):
     def name_get(self):
         result = []
         for record in self:
-            if record.value > 0:
-                name = f"[{record.code}] {record.name} ({record.value} days)"
-            else:
-                name = f"[{record.code}] {record.name}" if record.code else record.name
-            result.append((record.id, name))
+            result.append((record.id, record.name))
         return result
