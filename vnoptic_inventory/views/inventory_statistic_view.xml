@@ -48,12 +48,6 @@
                         </group>
                     </group>
 
-                    <!-- KHỐI MA TRẬN KẾT QUẢ -->
-                    <separator string="Ma trận SPH x CYL"/>
-                    <!-- 
-                        Field HTML này sẽ chứa bảng <table> do Python sinh ra.
-                        Dùng nolabel="1" để ẩn nhãn trường, colspan="2" để rộng full màn hình.
-                    -->
                     <field name="html_matrix" nolabel="1" colspan="2"/>
                 </sheet>
             </form>

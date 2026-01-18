@@ -249,18 +249,26 @@ class InventoryStatistic(models.TransientModel):
 
     def _build_html_matrix(self, sph_rows, cyl_cols, data_map):
         """
-        Hàm dựng bảng HTML string
+        Hàm dựng bảng HTML string với viewport cố định 4x4, scroll cho ma trận lớn hơn
         """
-        # Header cột (CYL)
-        # Thêm style sticky header
-        headers = "".join([f"<th class='text-center' style='min-width: 60px; background: #eee;'>{c}</th>" for c in cyl_cols])
+        # Header cột (CYL) - Cố định width 90px, white-space nowrap
+        headers = "".join([
+            f"<th style='min-width: 90px; width: 90px; max-width: 90px; white-space: nowrap; "
+            f"background: #eee; text-align: center; position: sticky; top: 0; z-index: 8; "
+            f"border: 1px solid #dee2e6; padding: 8px;'>{c}</th>" 
+            for c in cyl_cols
+        ])
         
         body_rows = ""
         for sph in sph_rows:
             body_rows += "<tr>"
             
-            # Cột đầu tiên (Header dòng SPH) - Sticky Left
-            body_rows += f"<th class='text-center' style='background: #eee; position: sticky; left: 0; z-index: 5;'>{sph}</th>"
+            # Cột đầu tiên (Header dòng SPH) - Cố định width 80px, sticky left
+            body_rows += (
+                f"<th style='min-width: 80px; width: 80px; max-width: 80px; white-space: nowrap; "
+                f"background: #eee; text-align: center; position: sticky; left: 0; z-index: 5; "
+                f"border: 1px solid #dee2e6; padding: 8px;'>{sph}</th>"
+            )
             
             for cyl in cyl_cols:
                 key = (sph, cyl)
@@ -269,12 +277,11 @@ class InventoryStatistic(models.TransientModel):
                 defect = val_data['defect']
                 
                 # Logic hiển thị cell
-                # Nếu có tồn kho (good > 0) -> nền xanh nhạt
                 bg_style = ""
                 cell_content = ""
                 
                 if good > 0:
-                    bg_style = "background-color: #e6f4ea;" # Xanh nhạt
+                    bg_style = "background-color: #e6f4ea;"
                     cell_content += f"<span style='color: #28a745; font-weight: bold;'>{int(good)}</span>"
                 
                 if defect > 0:
@@ -283,20 +290,28 @@ class InventoryStatistic(models.TransientModel):
                 
                 if not cell_content:
                     cell_content = "<span style='color: #ddd;'>-</span>"
-                    
-                body_rows += f"<td class='text-center' style='border: 1px solid #ddd; {bg_style}'>{cell_content}</td>"
+                
+                # Cell với width cố định 90px, không wrap text
+                body_rows += (
+                    f"<td style='min-width: 90px; width: 90px; max-width: 90px; white-space: nowrap; "
+                    f"text-align: center; border: 1px solid #ddd; padding: 8px; {bg_style}'>"
+                    f"{cell_content}</td>"
+                )
             
             body_rows += "</tr>"
 
-        # Table container style
-        # overflow: auto -> Để có thanh cuộn nếu bảng quá lớn
+        # Container với viewport cố định ~4x4 (450px × 300px)
+        # 4 cột × 90px + SPH 80px = 440px
+        # 4 dòng × 45px + header 45px = 225px
         return f"""
-        <div style="overflow: auto; max-height: 600px; width: 100%;">
-            <table class="table table-bordered table-sm" style="border-collapse: separate; border-spacing: 0;">
+        <div style="overflow: auto; max-width: 450px; max-height: 280px; border: 2px solid #dee2e6;">
+            <table style="border-collapse: separate; border-spacing: 0; table-layout: fixed;">
                 <thead>
                     <tr>
-                        <!-- Ô góc trên cùng bên trái (Giao nhau) -->
-                        <th style="background: #e9ecef; position: sticky; left: 0; top: 0; z-index: 10; border: 1px solid #dee2e6;">SPH \\ CYL</th>
+                        <!-- Ô góc trên cùng bên trái - Sticky cả top và left -->
+                        <th style="min-width: 80px; width: 80px; max-width: 80px; white-space: nowrap; "
+                            "background: #e9ecef; text-align: center; position: sticky; left: 0; top: 0; "
+                            "z-index: 10; border: 1px solid #dee2e6; padding: 8px;">SPH \\ CYL</th>
                         {headers}
                     </tr>
                 </thead>
