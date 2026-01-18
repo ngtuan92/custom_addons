@@ -41,6 +41,23 @@ class InventoryStatistic(models.TransientModel):
         for rec in self:
             rec.display_name = "Tồn Kho"
 
+    @api.model
+    def default_get(self, fields_list):
+        """Bảo đảm khi mở form lần đầu đã có bảng 4x4 trống (không hiện False)."""
+        defaults = super().default_get(fields_list)
+        # Lấy giá trị default hoặc fallback
+        sph_max = defaults.get('sph_max', 4)
+        cyl_max = defaults.get('cyl_max', 4)
+        sph_mode = defaults.get('sph_mode', 'negative')
+
+        sph_rows = self._generate_range_sph(sph_max, sph_mode)
+        cyl_cols = self._generate_range_cyl(cyl_max, sph_mode)
+        defaults['html_matrix'] = self._build_html_matrix(sph_rows, cyl_cols, {})
+        defaults['total_qty'] = 0
+        defaults['good_qty'] = 0
+        defaults['defect_qty'] = 0
+        return defaults
+
     @api.constrains('sph_max', 'cyl_max')
     def _check_max_range(self):
         """Validate SPH Max và CYL Max phải trong khoảng 4-20"""
@@ -49,6 +66,14 @@ class InventoryStatistic(models.TransientModel):
                 raise models.ValidationError(_("SPH Max phải từ 4 đến 20!"))
             if rec.cyl_max < 4 or rec.cyl_max > 20:
                 raise models.ValidationError(_("CYL Max phải từ 4 đến 20!"))
+
+    @api.model
+    def create(self, vals):
+        """Override create để tự động generate ma trận 4×4 mặc định khi mở dashboard"""
+        record = super(InventoryStatistic, self).create(vals)
+        # Tự động generate ma trận với giá trị mặc định
+        record.action_generate_matrix()
+        return record
 
     def action_generate_matrix(self):
         """
@@ -181,7 +206,7 @@ class InventoryStatistic(models.TransientModel):
         return True
 
     def action_reset_filter(self):
-        """Reset tất cả bộ lọc về giá trị mặc định"""
+        """Reset tất cả bộ lọc về giá trị mặc định và tự động generate lại bảng 4x4"""
         self.ensure_one()
         self.write({
             'sph_max': 4,
@@ -189,11 +214,11 @@ class InventoryStatistic(models.TransientModel):
             'sph_mode': 'negative',
             'brand_id': False,
             'index_id': False,
-            'html_matrix': False,
             'total_qty': 0,
             'good_qty': 0,
             'defect_qty': 0,
         })
+        self.action_generate_matrix()
         return True
     
     # 3. CÁC HÀM TIỆN ÍCH (UTILS / HELPERS)
@@ -274,61 +299,51 @@ class InventoryStatistic(models.TransientModel):
 
     def _build_html_matrix(self, sph_rows, cyl_cols, data_map):
         """
-        Hàm dựng bảng HTML string với viewport cố định 4x4, scroll cho ma trận lớn hơn
+        Luôn trả về bảng HTML, kể cả khi không có dữ liệu (không để False/None)
         """
-        # Header cột (CYL) - Cố định width 90px, white-space nowrap
+        # Nếu không có dòng/cột, vẫn render bảng trống
+        if not sph_rows:
+            sph_rows = [""]
+        if not cyl_cols:
+            cyl_cols = [""]
+
         headers = "".join([
             f"<th style='min-width: 70px; width: 70px; max-width: 70px; white-space: nowrap; "
             f"background: #eee; text-align: center; position: sticky; top: 0; z-index: 8; "
             f"border: 1px solid #dee2e6; padding: 8px;'>{c}</th>" 
             for c in cyl_cols
         ])
-        
+
         body_rows = ""
         for sph in sph_rows:
             body_rows += "<tr>"
-            
-            # Cột đầu tiên (Header dòng SPH) - Không sticky khi scroll ngang
             body_rows += (
                 f"<th style='min-width: 70px; width: 70px; max-width: 70px; white-space: nowrap; "
                 f"background: #eee; text-align: center; "
                 f"border: 1px solid #dee2e6; padding: 8px;'>{sph}</th>"
             )
-            
             for cyl in cyl_cols:
                 key = (sph, cyl)
                 val_data = data_map.get(key, {'good': 0, 'defect': 0})
                 good = val_data['good']
                 defect = val_data['defect']
-                
-                # Logic hiển thị cell
                 bg_style = ""
                 cell_content = ""
-                
                 if good > 0:
                     bg_style = "background-color: #e6f4ea;"
                     cell_content += f"<span style='color: #28a745; font-weight: bold;'>{int(good)}</span>"
-                
                 if defect > 0:
                     if cell_content: cell_content += " | "
                     cell_content += f"<span style='color: #dc3545; font-weight: bold;'>{int(defect)}</span>"
-                
                 if not cell_content:
                     cell_content = "<span style='color: #ddd;'>-</span>"
-                
-                # Cell với width cố định 70px, không wrap text
                 body_rows += (
                     f"<td style='min-width: 70px; width: 70px; max-width: 70px; white-space: nowrap; "
                     f"text-align: center; border: 1px solid #ddd; padding: 8px; {bg_style}'>"
                     f"{cell_content}</td>"
                 )
-            
             body_rows += "</tr>"
 
-        # Container đủ lớn để hiển thị FULL 17×17 (SPH/CYL Max = 4) không cần scroll
-        # Ngang: 80px (corner) + 17×70px (CYL) = 1270px
-        # Dọc: 45px (header) + 17×45px (SPH) = 810px
-        # Nếu nhập lớn hơn (10, 20...) thì scroll tự động xuất hiện
         return f"""
         <div style="overflow: auto; max-width: 1650px; max-height: 850px; border: 2px solid #dee2e6;">
             <table style="border-collapse: separate; border-spacing: 0; table-layout: fixed;">

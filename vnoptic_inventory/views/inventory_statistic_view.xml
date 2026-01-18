@@ -8,7 +8,7 @@
         <field name="name">vnoptic.inventory.statistic.form</field>
         <field name="model">vnoptic.inventory.statistic</field>
         <field name="arch" type="xml">
-            <form string="Inventory Statistic">
+            <form string="Inventory Statistic" create="false" edit="true" delete="false">
                 <header>
                     <!-- Nút bấm để chạy hàm tính toán ma trận -->
                     <button name="action_generate_matrix" 
