@@ -15,12 +15,12 @@
                             string="Thống kê" 
                             type="object" 
                             class="oe_highlight"/>
+                    <button name="action_reset_filter" 
+                            string="Reset Filter" 
+                            type="object"/>
                 </header>
                 <sheet>
-                    <div class="oe_title">
-                        <h1>Dashboard Tồn Kho Kính</h1>
-                    </div>
-                    
+               
                     <!-- KHỐI BỘ LỌC (FILTER) -->
                     <group>
                         <group string="Phạm vi SPH / CYL">
@@ -48,7 +48,7 @@
                         </group>
                     </group>
 
-                    <field name="html_matrix" nolabel="1" colspan="2"/>
+                    <field name="html_matrix" nolabel="1" colspan="2" widget="html"/>
                 </sheet>
             </form>
         </field>

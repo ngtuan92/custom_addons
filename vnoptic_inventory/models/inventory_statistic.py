@@ -8,27 +8,27 @@ class InventoryStatistic(models.TransientModel):
     # 1. CÁC TRƯỜNG DỮ LIỆU (FIELDS)
     
     # --- Tên hiển thị (bắt buộc với một số view) ---
-    display_name = fields.Char(default='Dashboard Tồn Kho', compute='_compute_display_name')
+    display_name = fields.Char(default='Tồn Kho', compute='_compute_display_name')
     
     # --- Bộ lọc (Filters) ---
-    sph_max = fields.Integer(string='SPH Maxx', default=4, required=True, 
+    sph_max = fields.Integer(string='SPH (4-20)', default=4, required=True, 
                             help="Nhập giá trị tuyệt đối. Ví dụ nhập 4 -> Phạm vi sẽ là 0..4 hoặc -4..0")
     
-    cyl_max = fields.Integer(string='CYL Max', default=4, required=True,
+    cyl_max = fields.Integer(string='CYL (4-20)', default=4, required=True,
                             help="Nhập giá trị tuyệt đối cho CYL")
     
     sph_mode = fields.Selection([
         ('negative', 'Âm (-)'),       # SPH < 0, CYL < 0
         ('positive', 'Dương (+)'),    # SPH > 0, CYL > 0
         ('both', 'Cả hai (±)'),       # SPH -..+, CYL -..0 (hoặc theo input)
-    ], string='Chế độ (Âm/Dương)', default='negative', required=True)
+    ], string='Phạm vi SPH', default='negative', required=True)
 
     # --- Liên kết (Relational Fields) ---
     brand_id = fields.Many2one('xnk.brand', string='Thương hiệu')
     index_id = fields.Many2one('product.lens.index', string='Chiết suất mắt kính')
 
     # --- Kết quả hiển thị (Result Fields) ---
-    html_matrix = fields.Html(string='Matrix Data', readonly=True, 
+    html_matrix = fields.Text(string='Matrix Data', readonly=True, sanitize=False,
                              help="Chứa mã HTML của bảng ma trận được sinh ra từ Python")
     
     total_qty = fields.Integer(string='Tổng Tồn Kho', readonly=True)
@@ -39,7 +39,16 @@ class InventoryStatistic(models.TransientModel):
 
     def _compute_display_name(self):
         for rec in self:
-            rec.display_name = "Dashboard Tồn Kho"
+            rec.display_name = "Tồn Kho"
+
+    @api.constrains('sph_max', 'cyl_max')
+    def _check_max_range(self):
+        """Validate SPH Max và CYL Max phải trong khoảng 4-20"""
+        for rec in self:
+            if rec.sph_max < 4 or rec.sph_max > 20:
+                raise models.ValidationError(_("SPH Max phải từ 4 đến 20!"))
+            if rec.cyl_max < 4 or rec.cyl_max > 20:
+                raise models.ValidationError(_("CYL Max phải từ 4 đến 20!"))
 
     def action_generate_matrix(self):
         """
@@ -170,6 +179,22 @@ class InventoryStatistic(models.TransientModel):
 
         # Button type="object" tự reload record, không cần trả về action (tránh sinh thêm view)
         return True
+
+    def action_reset_filter(self):
+        """Reset tất cả bộ lọc về giá trị mặc định"""
+        self.ensure_one()
+        self.write({
+            'sph_max': 4,
+            'cyl_max': 4,
+            'sph_mode': 'negative',
+            'brand_id': False,
+            'index_id': False,
+            'html_matrix': False,
+            'total_qty': 0,
+            'good_qty': 0,
+            'defect_qty': 0,
+        })
+        return True
     
     # 3. CÁC HÀM TIỆN ÍCH (UTILS / HELPERS)
 
@@ -253,7 +278,7 @@ class InventoryStatistic(models.TransientModel):
         """
         # Header cột (CYL) - Cố định width 90px, white-space nowrap
         headers = "".join([
-            f"<th style='min-width: 90px; width: 90px; max-width: 90px; white-space: nowrap; "
+            f"<th style='min-width: 70px; width: 70px; max-width: 70px; white-space: nowrap; "
             f"background: #eee; text-align: center; position: sticky; top: 0; z-index: 8; "
             f"border: 1px solid #dee2e6; padding: 8px;'>{c}</th>" 
             for c in cyl_cols
@@ -263,10 +288,10 @@ class InventoryStatistic(models.TransientModel):
         for sph in sph_rows:
             body_rows += "<tr>"
             
-            # Cột đầu tiên (Header dòng SPH) - Cố định width 80px, sticky left
+            # Cột đầu tiên (Header dòng SPH) - Không sticky khi scroll ngang
             body_rows += (
-                f"<th style='min-width: 80px; width: 80px; max-width: 80px; white-space: nowrap; "
-                f"background: #eee; text-align: center; position: sticky; left: 0; z-index: 5; "
+                f"<th style='min-width: 70px; width: 70px; max-width: 70px; white-space: nowrap; "
+                f"background: #eee; text-align: center; "
                 f"border: 1px solid #dee2e6; padding: 8px;'>{sph}</th>"
             )
             
@@ -291,27 +316,26 @@ class InventoryStatistic(models.TransientModel):
                 if not cell_content:
                     cell_content = "<span style='color: #ddd;'>-</span>"
                 
-                # Cell với width cố định 90px, không wrap text
+                # Cell với width cố định 70px, không wrap text
                 body_rows += (
-                    f"<td style='min-width: 90px; width: 90px; max-width: 90px; white-space: nowrap; "
+                    f"<td style='min-width: 70px; width: 70px; max-width: 70px; white-space: nowrap; "
                     f"text-align: center; border: 1px solid #ddd; padding: 8px; {bg_style}'>"
                     f"{cell_content}</td>"
                 )
             
             body_rows += "</tr>"
 
-        # Container với viewport lớn hơn để hiển thị nhiều cell cùng lúc
-        # Max-width: 900px (~10 cột CYL), Max-height: 600px (~13 dòng SPH)
-        # Scroll tự động xuất hiện khi data lớn hơn (ví dụ 17x17 với range 0 đến -4)
+        # Container đủ lớn để hiển thị FULL 17×17 (SPH/CYL Max = 4) không cần scroll
+        # Ngang: 80px (corner) + 17×70px (CYL) = 1270px
+        # Dọc: 45px (header) + 17×45px (SPH) = 810px
+        # Nếu nhập lớn hơn (10, 20...) thì scroll tự động xuất hiện
         return f"""
-        <div style="overflow: auto; max-width: 900px; max-height: 600px; border: 2px solid #dee2e6;">
+        <div style="overflow: auto; max-width: 1650px; max-height: 850px; border: 2px solid #dee2e6;">
             <table style="border-collapse: separate; border-spacing: 0; table-layout: fixed;">
                 <thead>
                     <tr>
-                        <!-- Ô góc trên cùng bên trái - Sticky cả top và left -->
-                        <th style="min-width: 80px; width: 80px; max-width: 80px; white-space: nowrap; "
-                            "background: #e9ecef; text-align: center; position: sticky; left: 0; top: 0; "
-                            "z-index: 10; border: 1px solid #dee2e6; padding: 8px;">SPH \\ CYL</th>
+                        <!-- Ô góc trên cùng bên trái - Sticky top khi scroll dọc -->
+                        <th style="min-width: 80px; width: 80px; max-width: 80px; white-space: nowrap; background: #e9ecef; text-align: center; position: sticky; top: 0; z-index: 10; border: 1px solid #dee2e6; padding: 8px;">SPH \\ CYL</th>
                         {headers}
                     </tr>
                 </thead>
