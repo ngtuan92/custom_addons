@@ -12,7 +12,8 @@ class ProductTemplate(models.Model):
 
     access_total = fields.Integer("Accessory Total")
     cid_ncc = fields.Char("Supplier code")
-    unit = fields.Char("Unit")
+    unit = fields.Char("Unit", default="Chiếc")
+    description = fields.Text("Description")
     uses = fields.Text("Uses")
     guide = fields.Text("Guide")
     warning = fields.Text("Warning")
@@ -22,8 +23,23 @@ class ProductTemplate(models.Model):
     supplier_id = fields.Many2one('res.partner', string='Supplier')
     group_id = fields.Many2one('product.group', string='Product Group')
     status_group_id = fields.Many2one('product.status', string='Status Product Group')
+    
+    # Multiple warranty fields
     warranty_id = fields.Many2one('xnk.warranty', 'Warranty')
+    warranty_detail_id = fields.Many2one('xnk.warranty', 'Warranty Detail')
+    warranty_retail_id = fields.Many2one('xnk.warranty', 'Warranty Retail')
+    warranty_supplier_id = fields.Many2one('xnk.warranty', 'Warranty Supplier')
+    
+    # Currency selection for foreign currency products
+    currency_selection = fields.Selection([
+        ('vnd', 'VND'),
+        ('usd', 'USD'),
+        ('japan', 'Japan (YÊN)'),
+        ('china', 'China (TỆ)')
+    ], string='Currency Selection', default='vnd')
     currency_zone_id = fields.Many2one('res.currency', 'Currency Zone')
+    x_currency_zone_value = fields.Float('Exchange Rate', default=1.0, digits=(12, 2))
+    
     status_product_id = fields.Many2one('product.status', 'Status Product')
     brand_id = fields.Many2one('xnk.brand', 'Brand', index=True, tracking=True)
     country_id = fields.Many2one('xnk.country', 'Country of Origin')
@@ -36,6 +52,24 @@ class ProductTemplate(models.Model):
 
     lens_ids = fields.One2many('product.lens', 'product_tmpl_id', 'Lens Details')
     opt_ids = fields.One2many('product.opt', 'product_tmpl_id', 'Optical Details')
+    
+    @api.onchange('currency_selection')
+    def _onchange_currency_selection(self):
+        """Set currency_zone_id based on selection and suggest exchange rate"""
+        if self.currency_selection:
+            currency_map = {
+                'vnd': 'VND',
+                'usd': 'USD',
+                'japan': 'JPY',
+                'china': 'CNY'
+            }
+            currency_code = currency_map.get(self.currency_selection)
+            if currency_code:
+                currency = self.env['res.currency'].sudo().search([('name', '=', currency_code)], limit=1)
+                if currency:
+                    self.currency_zone_id = currency.id
+                    if self.currency_selection == 'vnd':
+                        self.x_currency_zone_value = 1.0
 
     @api.onchange('group_id', 'brand_id')
     def _onchange_generate_product_code(self):
@@ -68,7 +102,15 @@ class ProductTemplate(models.Model):
             if 'opt_ids' in vals:
                 del vals['opt_ids']
 
-        return super().create(vals)
+        product = super().create(vals)
+        
+        # Auto-create lens/opt record if needed
+        if product_type == 'lens' and not product.lens_ids:
+            self.env['product.lens'].create({'product_tmpl_id': product.id})
+        elif product_type == 'opt' and not product.opt_ids:
+            self.env['product.opt'].create({'product_tmpl_id': product.id})
+        
+        return product
 
     def write(self, vals):
         product_type = vals.get('product_type') or self.product_type

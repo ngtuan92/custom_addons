@@ -3,10 +3,11 @@
 import base64
 import json
 import logging
+from datetime import datetime
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons.vnoptic_product import utils as vnoptic_utils
-from ..utils import excel_reader, data_cache, import_validator
+from ..utils import excel_reader, data_cache, import_validator, excel_template_generator
 
 _logger = logging.getLogger(__name__)
 
@@ -18,7 +19,6 @@ class ProductExcelImport(models.TransientModel):
     # File upload
     excel_file = fields.Binary(
         string='Excel File',
-        required=True,
         help='Upload Excel file with product data'
     )
     file_name = fields.Char('File Name')
@@ -56,6 +56,112 @@ class ProductExcelImport(models.TransientModel):
     success_count = fields.Integer('Successful Imports', readonly=True, default=0)
     error_count = fields.Integer('Errors', readonly=True, default=0)
     error_log = fields.Text('Error Log', readonly=True)
+    
+    # Template download selection
+    template_type = fields.Selection([
+        ('lens', 'Mẫu Mắt (Lens)'),
+        ('opt', 'Mẫu Gọng/Kính'),
+        ('accessory', 'Mẫu Phụ kiện'),
+    ], string='Tải mẫu nhập liệu')
+    
+    @api.onchange('template_type')
+    def _onchange_template_type(self):
+        """Auto download template when selection changes"""
+        if self.template_type:
+            # Reset selection after download
+            template_type = self.template_type
+            self.template_type = False
+            
+            try:
+                if template_type == 'lens':
+                    template_data = excel_template_generator.generate_lens_template()
+                    filename = f"BangNhap_Mat_{datetime.now().strftime('%Y%m%d')}.xlsx"
+                elif template_type == 'opt':
+                    template_data = excel_template_generator.generate_opt_template()
+                    filename = f"BangNhap_Gong_{datetime.now().strftime('%Y%m%d')}.xlsx"
+                elif template_type == 'accessory':
+                    template_data = excel_template_generator.generate_accessory_template()
+                    filename = f"BangNhap_PhuKien_{datetime.now().strftime('%Y%m%d')}.xlsx"
+                else:
+                    return
+                
+                # Create attachment
+                attachment = self.env['ir.attachment'].create({
+                    'name': filename,
+                    'type': 'binary',
+                    'datas': base64.b64encode(template_data),
+                    'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                })
+                
+                # Return download action
+                return {
+                    'type': 'ir.actions.act_url',
+                    'url': f'/web/content/{attachment.id}?download=true',
+                    'target': 'new',
+                }
+            except Exception as e:
+                _logger.error(f"Error generating template: {e}", exc_info=True)
+                return {
+                    'warning': {
+                        'title': 'Lỗi',
+                        'message': f'Không thể tạo mẫu: {str(e)}'
+                    }
+                }
+    
+    # ===========================================
+    # DOWNLOAD TEMPLATE ACTIONS
+    # ===========================================
+    
+    def action_download_lens_template(self):
+        """Download Excel template for Lens products"""
+        self.ensure_one()
+        try:
+            template_data = excel_template_generator.generate_lens_template()
+            filename = f"BangNhap_Mat_{datetime.now().strftime('%Y%m%d')}.xlsx"
+            return self._create_download_action(template_data, filename)
+        except Exception as e:
+            _logger.error(f"Error generating lens template: {e}", exc_info=True)
+            raise UserError(_('Error generating template: %s') % str(e))
+    
+    def action_download_opt_template(self):
+        """Download Excel template for Optical products"""
+        self.ensure_one()
+        try:
+            template_data = excel_template_generator.generate_opt_template()
+            filename = f"BangNhap_Gong_{datetime.now().strftime('%Y%m%d')}.xlsx"
+            return self._create_download_action(template_data, filename)
+        except Exception as e:
+            _logger.error(f"Error generating optical template: {e}", exc_info=True)
+            raise UserError(_('Error generating template: %s') % str(e))
+    
+    def action_download_accessory_template(self):
+        """Download Excel template for Accessory products"""
+        self.ensure_one()
+        try:
+            template_data = excel_template_generator.generate_accessory_template()
+            filename = f"BangNhap_PhuKien_{datetime.now().strftime('%Y%m%d')}.xlsx"
+            return self._create_download_action(template_data, filename)
+        except Exception as e:
+            _logger.error(f"Error generating accessory template: {e}", exc_info=True)
+            raise UserError(_('Error generating template: %s') % str(e))
+    
+    def _create_download_action(self, file_data, filename):
+        """Create download action for Excel file"""
+        # Create attachment
+        attachment = self.env['ir.attachment'].create({
+            'name': filename,
+            'type': 'binary',
+            'datas': base64.b64encode(file_data),
+            'mimetype': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        })
+        
+        # Return download action
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/web/content/{attachment.id}?download=true',
+            'target': 'new',
+        }
+    
     
     def action_parse_excel(self):
         """

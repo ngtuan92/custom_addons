@@ -5,7 +5,7 @@ class ProductOpt(models.Model):
     _name = 'product.opt'
     _description = 'Optical Product Details'
 
-    product_tmpl_id = fields.Many2one('product.template', 'Product Template', required=True)
+    product_tmpl_id = fields.Many2one('product.template', 'Product Template')
     product_id = fields.Many2one('product.product', 'Product Variant')
 
     # Thông tin sản phẩm

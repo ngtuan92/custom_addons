@@ -1,11 +1,11 @@
 {
     "name": "VNOPTIC Products",
-    "version": "16.0.1.0.6",
+    "version": "16.0.1.0.7",
     "summary": "Lens & Optical product management",
     "author": "Your Company",
-    "depends": ["product", "base", "xnk_intergration"],
+    "depends": ["product", "base", "xnk_intergration", "sale", "purchase", "stock"],
     "external_dependencies": {
-        "python": ["openpyxl"],
+        "python": ["openpyxl", "xlsxwriter"],
     },
     "data": [
         'data/product_group_type_data.xml',

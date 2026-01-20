@@ -25,33 +25,67 @@
         </field>
     </record>
     
-    <!-- Form View -->
+    <!-- Form View - Full Page for Import -->
     <record id="view_product_excel_import_form" model="ir.ui.view">
         <field name="name">product.excel.import.form</field>
         <field name="model">product.excel.import</field>
         <field name="arch" type="xml">
-            <form string="Import Products from Excel">
+            <form string="Import sản phẩm từ Excel">
                 <header>
+                    <!-- Template download buttons -->
+                    <button name="action_download_lens_template" type="object"
+                            string="Mẫu mắt" class="btn-secondary"
+                            attrs="{'invisible': [('state', '!=', 'upload')]}"/>
+                    <button name="action_download_opt_template" type="object"
+                            string="Mẫu gọng" class="btn-secondary"
+                            attrs="{'invisible': [('state', '!=', 'upload')]}"/>
+                    <button name="action_download_accessory_template" type="object"
+                            string="Mẫu phụ kiện" class="btn-secondary"
+                            attrs="{'invisible': [('state', '!=', 'upload')]}"/>
+                    
+                    <!-- Action buttons -->
+                    <button name="action_parse_excel" type="object" 
+                            string="Xem trước" class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'upload')]}"/>
+                    
+                    <button name="action_confirm_import" type="object" 
+                            string="Xác nhận Import" class="btn-primary"
+                            attrs="{'invisible': [('state', '!=', 'preview')]}"
+                            confirm="Bạn có chắc muốn import các sản phẩm này?"/>
+                    <button name="action_back_to_upload" type="object" 
+                            string="Quay lại" class="btn-secondary"
+                            attrs="{'invisible': [('state', '!=', 'preview')]}"/>
+                    
                     <field name="state" widget="statusbar" statusbar_visible="upload,preview,done"/>
                 </header>
                 
                 <sheet>
                     <!-- UPLOAD STATE -->
-                    <group attrs="{'invisible': [('state', '!=', 'upload')]}">
+                    <div class="oe_title" attrs="{'invisible': [('state', '!=', 'upload')]}">
+                        <h1>Import sản phẩm từ Excel</h1>
+                    </div>
+                    
+                    <div attrs="{'invisible': [('state', '!=', 'upload')]}">
+                        <!-- Upload Section -->
                         <group>
-                            <field name="excel_file" filename="file_name" required="1"/>
-                            <field name="file_name" invisible="1"/>
+                            <group>
+                                <field name="excel_file" filename="file_name" 
+                                       widget="binary" 
+                                       string="Chọn file Excel"/>
+                                <field name="file_name" invisible="1"/>
+                                <field name="template_type" invisible="1"/>
+                            </group>
+                            <group attrs="{'invisible': [('excel_file', '=', False)]}">
+                                <field name="product_type" readonly="1" string="Loại sản phẩm"/>
+                            </group>
                         </group>
-                        <group attrs="{'invisible': [('excel_file', '=', False)]}">
-                            <field name="product_type" readonly="1"/>
-                        </group>
-                    </group>
+                    </div>
                     
                     <!-- PREVIEW STATE -->
                     <notebook attrs="{'invisible': [('state', '!=', 'preview')]}">
-                        <page string="Preview Data">
+                        <page string="Xem trước dữ liệu">
                             <group>
-                                <field name="product_type" readonly="1"/>
+                                <field name="product_type" readonly="1" string="Loại sản phẩm"/>
                             </group>
                             <separator string="Dữ liệu từ Excel (20 dòng/trang)"/>
                             <field name="preview_line_ids" nolabel="1">
@@ -78,7 +112,7 @@
                             <field name="preview_data" widget="ace" 
                                    options="{'mode': 'json'}" readonly="1" nolabel="1"/>
                         </page>
-                        <page string="Validation Errors" 
+                        <page string="Lỗi validation" 
                               attrs="{'invisible': [('error_log', '=', False)]}">
                             <field name="error_log" widget="text" readonly="1" nolabel="1"/>
                         </page>
@@ -87,12 +121,12 @@
                     <!-- DONE STATE -->
                     <group attrs="{'invisible': [('state', '!=', 'done')]}">
                         <group>
-                            <field name="success_count" readonly="1"/>
-                            <field name="error_count" readonly="1"/>
+                            <field name="success_count" readonly="1" string="Sản phẩm thành công"/>
+                            <field name="error_count" readonly="1" string="Số lỗi"/>
                         </group>
                     </group>
                     <group attrs="{'invisible': ['|', ('state', '!=', 'done'), ('error_log', '=', False)]}">
-                        <separator string="Result"/>
+                        <separator string="Chi tiết kết quả"/>
                         <field name="error_log" widget="text" readonly="1" nolabel="1"/>
                     </group>
                 </sheet>
@@ -100,47 +134,74 @@
                 <footer>
                     <!-- Upload state buttons -->
                     <button name="action_parse_excel" type="object" 
-                            string="Next: Preview" 
+                            string="Tiếp: Xem trước" 
                             attrs="{'invisible': [('state', '!=', 'upload')]}"
-                            class="btn-primary"/>
+                            class="btn-primary"
+                            icon="fa-arrow-right"/>
                     
                     <!-- Preview state buttons -->
                     <button name="action_confirm_import" type="object" 
-                            string="Confirm Import" 
+                            string="Xác nhận Import" 
                             attrs="{'invisible': [('state', '!=', 'preview')]}"
                             class="btn-primary"
-                            confirm="Are you sure you want to import these products? This action cannot be undone."/>
+                            icon="fa-check"
+                            confirm="Bạn có chắc muốn import các sản phẩm này? Hành động này không thể hoàn tác."/>
                     <button name="action_back_to_upload" type="object" 
-                            string="Back" 
+                            string="Quay lại" 
                             attrs="{'invisible': [('state', '!=', 'preview')]}"
-                            class="btn-secondary"/>
+                            class="btn-secondary"
+                            icon="fa-arrow-left"/>
                     
                     <!-- Done state button -->
-                    <button string="Close" special="cancel" 
+                    <button string="Đóng" special="cancel" 
                             attrs="{'invisible': [('state', '!=', 'done')]}"
                             class="btn-primary"/>
                     
-                    <button string="Cancel" class="btn-secondary" special="cancel"
+                    <button string="Hủy" class="btn-secondary" special="cancel"
                             attrs="{'invisible': [('state', '=', 'done')]}"/>
                 </footer>
             </form>
         </field>
     </record>
     
-    <!-- Action -->
+    <!-- Action - Full Page (current) -->
     <record id="action_import_excel_products" model="ir.actions.act_window">
-        <field name="name">Import Products from Excel</field>
+        <field name="name">Import sản phẩm từ Excel</field>
         <field name="res_model">product.excel.import</field>
         <field name="view_mode">form</field>
-        <field name="target">new</field>
+        <field name="target">current</field>
         <field name="view_id" ref="view_product_excel_import_form"/>
     </record>
     
-    <!-- Menu Item -->
+    <!-- ==============================================
+         MENU ITEMS FOR DIFFERENT MODULES
+         ============================================== -->
+    
+    <!-- Menu in Sale Module -->
+    <menuitem id="menu_import_excel_sale"
+              name="Import sản phẩm"
+              parent="sale.product_menu_catalog"
+              action="action_import_excel_products"
+              sequence="99"/>
+    
+    <!-- Menu in Purchase Module -->
+    <menuitem id="menu_import_excel_purchase"
+              name="Import sản phẩm"
+              parent="purchase.menu_purchase_products"
+              action="action_import_excel_products"
+              sequence="99"/>
+    
+    <!-- Menu in Inventory/Stock Module -->
+    <menuitem id="menu_import_excel_stock"
+              name="Import sản phẩm"
+              parent="stock.menu_stock_inventory_control"
+              action="action_import_excel_products"
+              sequence="99"/>
+    
+    <!-- Keep old menu for backward compatibility -->
     <menuitem id="menu_import_excel_products"
               name="Import từ Excel"
               parent="menu_products_main"
               action="action_import_excel_products"
               sequence="101"/>
 </odoo>
-
