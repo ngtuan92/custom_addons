@@ -7,9 +7,21 @@ class ResUsers(models.Model):
         # Danh sách các field KHÔNG theo dõi (vì lý do bảo mật hoặc không cần thiết)
         IGNORED_FIELDS = ['password', 'message_ids', 'message_follower_ids']
         
-        # Theo dõi tất cả các field có trong vals, trừ các field bị ignore
-        fields_to_check = [f for f in vals if f not in IGNORED_FIELDS]
+        # Theo dõi tất cả các field có trong vals, trừ các field bị ignore và các field ảo
+        # Tuy nhiên, nếu có field ảo liên quan đến nhóm (sel_groups, in_group), ta CẦN theo dõi 'groups_id'
         
+        has_virtual_group_fields = any(k.startswith(('sel_groups_', 'in_group_')) for k in vals)
+        
+        fields_to_check = [
+            f for f in vals 
+            if f not in IGNORED_FIELDS 
+            and not f.startswith(('sel_groups_', 'in_group_'))
+        ]
+        
+        # Nếu có thay đổi nhóm qua giao diện (ảo), bắt buộc theo dõi groups_id
+        if has_virtual_group_fields and 'groups_id' not in fields_to_check:
+            fields_to_check.append('groups_id')
+            
         if not fields_to_check:
             return super(ResUsers, self).write(vals)
 
@@ -54,15 +66,18 @@ class ResUsers(models.Model):
                         added_names = Group.browse(added).mapped('display_name') # Dùng display_name rõ hơn
                         removed_names = Group.browse(removed).mapped('display_name')
                         
-                        # Format log ngắn gọn
-                        msg_parts = []
+                        # Format log ngắn gọn theo style Delta/Diff
+                        # Cột Mới: chứa những cái được THÊM vào
                         if added_names:
-                            msg_parts.append(f"Thêm: {', '.join(added_names)}")
+                             new_val = f"Thêm: {', '.join(added_names)}"
+                        else:
+                             new_val = ""
+                             
+                        # Cột Cũ: chứa những cái bị BỎ đi (đã mất)
                         if removed_names:
-                            msg_parts.append(f"Bỏ: {', '.join(removed_names)}")
-                            
-                        new_val = "\n".join(msg_parts)
-                        old_val = "" # Với diff log kiểu này, old_val có thể để trống hoặc ghi chú gì đó
+                             old_val = f"Bỏ: {', '.join(removed_names)}"
+                        else:
+                             old_val = ""
                     else:
                         new_val = None # Không thay đổi
                 else:
