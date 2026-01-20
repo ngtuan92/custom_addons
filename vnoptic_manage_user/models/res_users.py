@@ -66,14 +66,43 @@ class ResUsers(models.Model):
                     else:
                         new_val = None # Không thay đổi
                 else:
-                    # Các field cơ bản
-                    new_val = user[field]
-                    if old_val != new_val:
-                         # Convert sang string để lưu log
-                        new_val = str(new_val)
-                        old_val = str(old_val)
+                    # Các field cơ bản và relation khác
+                    new_val_raw = user[field]
+                    
+                    if old_val != new_val_raw:
+                        # Hàm helper để format giá trị hiển thị đẹp hơn
+                        def format_val(val, field_name):
+                            if not val:
+                                return ""
+                            ftype = self._fields[field_name].type
+                            
+                            if ftype == 'many2one':
+                                return val.display_name or ''
+                            elif ftype in ['many2many', 'one2many']:
+                                return ', '.join(val.mapped('display_name'))
+                            elif ftype == 'boolean':
+                                return 'True' if val else 'False'
+                            elif ftype == 'selection':
+                                return dict(self._fields[field_name].selection).get(val, val)
+                            else:
+                                return str(val)
+
+                        # Format lại old và new value
+                        # Lưu ý: old_val hiện tại đang lưu raw value (object hoặc id) từ bước convert trước
+                        # Tuy nhiên do old_values lưu object từ user[field], nên nó vẫn còn là recordset (với m2o, m2m)
+                        # Trừ khi ở bước lưu old_values ta đã chưa xử lý kỹ.
+                        # Check lại bước 1: old_values[user.id][field] = user[field] -> Đang lưu recordset thật.
+                        
+                        old_val_str = format_val(old_val, field)
+                        new_val = format_val(new_val_raw, field)
+                        
+                        if old_val_str != new_val:
+                            old_val = old_val_str
+                        else:
+                            new_val = None # Nếu format ra string giống nhau thì thôi (ví dụ m2m thứ tự khác nhau nhưng sort rồi, hoặc object cũ mới display_name giống nhau)
+                            
                     else:
-                        new_val = None # Đánh dấu không thay đổi để bỏ qua
+                         new_val = None
 
                 # Nếu có thay đổi thì tạo record log
                 if new_val is not None:
